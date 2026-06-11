@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTO / OPC 양식 자동완성</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">⬡</span>
+      <span class="logo-text">MTO <span class="logo-slash">/</span> OPC</span>
+      <span class="logo-sub">양식 자동완성</span>
+    </div>
+    <div class="header-meta">
+      <span class="chip chip-blue">Samsung DS</span>
+      <span class="chip chip-slate">DRAM 설계팀</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main-layout">
+
+  <!-- ── LEFT: 표준데이터 입력 ── -->
+  <section class="panel panel-left">
+    <div class="panel-head">
+      <h2 class="panel-title">
+        <span class="step-badge">01</span>
+        표준데이터 입력
+      </h2>
+      <p class="panel-desc">MTO 표준 폼 전체를 복사하여 아래에 붙여넣기 하세요.</p>
+    </div>
+
+    <div class="paste-zone" id="paste-zone">
+      <textarea id="raw-input" spellcheck="false"
+        placeholder="여기에 표준데이터를 붙여넣기 하세요 (Ctrl+V)&#10;&#10;예시)&#10;MTO Date&#9;2026-07월 예정&#10;목적&#9;VH-ver R.L.ECC 개선...&#10;Device&#9;16GLPDDR5_VHG&#10;Process&#9;D1b&#10;귀속부서&#9;DRAM 설계팀&#10;..."></textarea>
+      <div class="paste-overlay" id="paste-overlay">
+        <div class="paste-icon">⌘ V</div>
+        <div class="paste-hint">클릭 후 붙여넣기</div>
+      </div>
+    </div>
+
+    <div class="parse-actions">
+      <button class="btn btn-ghost" onclick="clearAll()">초기화</button>
+      <button class="btn btn-primary" onclick="parseAndFill()">
+        <span class="btn-icon">⚡</span> 자동완성 실행
+      </button>
+    </div>
+
+    <!-- 파싱 결과 미리보기 -->
+    <div class="parsed-preview" id="parsed-preview" style="display:none">
+      <div class="preview-head">파싱된 항목</div>
+      <div class="preview-grid" id="preview-grid"></div>
+    </div>
+  </section>
+
+  <!-- ── RIGHT: 양식 출력 ── -->
+  <section class="panel panel-right">
+    <div class="panel-head">
+      <h2 class="panel-title">
+        <span class="step-badge">02</span>
+        양식 출력
+      </h2>
+      <p class="panel-desc">자동완성된 결과를 확인하고 복사하세요.</p>
+    </div>
+
+    <div class="form-tab-bar">
+      <button class="form-tab active" id="tab-opc" onclick="switchForm('opc')">
+        <span class="tab-dot dot-blue"></span> OPC 양식
+      </button>
+      <button class="form-tab" id="tab-mto" onclick="switchForm('mto')">
+        <span class="tab-dot dot-green"></span> MTO 양식
+      </button>
+    </div>
+
+    <!-- ── OPC Form ── -->
+    <div class="form-body active" id="form-opc">
+
+      <div class="form-section">
+        <div class="section-label accent-blue">DB 기본 정보</div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Device</label>
+            <input id="opc-device" type="text" placeholder="예) 12GLPDDR5_VLG">
+          </div>
+          <div class="field">
+            <label>Process</label>
+            <input id="opc-process" type="text" placeholder="예) D1b">
+          </div>
+          <div class="field field-full">
+            <label>New lib.</label>
+            <input id="opc-newlib" type="text" class="mono" placeholder="예) D1B_12GLPDDR5_VLG_L45_S10_...">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label accent-blue">OPC 정보</div>
+        <div class="field-grid">
+          <div class="field field-full">
+            <label>목적</label>
+            <input id="opc-purpose" type="text" placeholder="예) R.L ECC개선으로 mn0 소자 변경">
+          </div>
+          <div class="field">
+            <label>설계 TEG 변경</label>
+            <input id="opc-teg" type="text" placeholder="O / X">
+          </div>
+          <div class="field">
+            <label>History</label>
+            <input id="opc-history" type="text" placeholder="LINK">
+          </div>
+          <div class="field">
+            <label>진행률</label>
+            <input id="opc-progress" type="text" placeholder="예) 1/1 (100.00%)">
+          </div>
+          <div class="field">
+            <label>Upload Date</label>
+            <input id="opc-date" type="text" placeholder="예) 06월 05일 15:35">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label accent-orange">Mask 정보</div>
+        <div class="mask-table-wrap">
+          <table class="mask-table">
+            <thead>
+              <tr>
+                <th>Mask ID (PSM 포함)</th>
+                <th>Layer</th>
+                <th>SEEDS Verification</th>
+                <th>특이사항 Comment</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="opc-mask-body"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-add-row" onclick="addRow('opc')">+ 행 추가</button>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="resetForm('opc')">초기화</button>
+        <button class="btn btn-copy btn-copy-blue" onclick="copyForm('opc')">
+          📋 OPC 양식 복사
+        </button>
+      </div>
+    </div>
+
+    <!-- ── MTO Form ── -->
+    <div class="form-body" id="form-mto">
+
+      <div class="form-section">
+        <div class="section-label accent-green">DB 기본 정보</div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Device</label>
+            <input id="mto-device" type="text" placeholder="예) 12GLPDDR5_VLG">
+          </div>
+          <div class="field">
+            <label>Process</label>
+            <input id="mto-process" type="text" placeholder="예) D1b">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label accent-green">MTO 정보</div>
+        <div class="field-grid">
+          <div class="field field-full">
+            <label>목적</label>
+            <input id="mto-purpose" type="text" placeholder="예) R.L ECC개선으로 mn0 소자 변경">
+          </div>
+          <div class="field">
+            <label>귀속부서</label>
+            <input id="mto-dept" type="text" placeholder="예) DRAM 설계팀">
+          </div>
+          <div class="field">
+            <label>RECN</label>
+            <input id="mto-recn" type="text" placeholder="LINK">
+          </div>
+          <div class="field">
+            <label>진행률</label>
+            <input id="mto-progress" type="text" placeholder="예) 1/1 (100.00%)">
+          </div>
+          <div class="field">
+            <label>MTO Date</label>
+            <input id="mto-date" type="text" placeholder="예) 06월 05일 15:35">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-label accent-orange">Mask / Layer 정보</div>
+        <div class="mask-table-wrap">
+          <table class="mask-table">
+            <thead>
+              <tr>
+                <th>Mask ID (PSM 포함)</th>
+                <th>Layer</th>
+                <th>SEEDS Verification</th>
+                <th>특이사항 Comment</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="mto-mask-body"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-add-row" onclick="addRow('mto')">+ 행 추가</button>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="resetForm('mto')">초기화</button>
+        <button class="btn btn-copy btn-copy-green" onclick="copyForm('mto')">
+          📋 MTO 양식 복사
+        </button>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- ══════════════ TOAST ══════════════ -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
