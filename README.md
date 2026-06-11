@@ -2,7 +2,7 @@
 
 > Samsung DS DRAM 설계팀 — MTO 표준데이터 → OPC / MTO 양식 자동완성 도구
 
-🔗 **Live Site**: `https://one1peace.github.io/MTO_smartForm/`
+🔗 **Live Site**: `https://one1peace.github.io/MTO_SmartForm/`
 
 ---
 
