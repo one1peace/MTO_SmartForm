@@ -1,55 +1,15 @@
-# MTO / OPC 양식 자동완성
+# OPC · MTO 양식 자동작성기
 
-> Samsung DS DRAM 설계팀 — MTO 표준데이터 → OPC / MTO 양식 자동완성 도구
-
-🔗 **Live Site**: `https://one1peace.github.io/MTO_SmartForm/`
-
----
+DB 기준 표를 붙여넣으면 OPC · MTO 이메일 양식을 자동 생성합니다.
 
 ## 사용법
+1. `index.html`을 GitHub Pages로 배포
+2. DB 기준 표 전체를 엑셀에서 복사 (Ctrl+C)
+3. 왼쪽 입력창에 붙여넣기 (Ctrl+V)
+4. **양식 생성** 버튼 클릭
+5. OPC / MTO 표 복사 → 이메일 붙여넣기
 
-1. **표준데이터 입력** — MTO 표준 폼 전체를 복사하여 좌측 텍스트 박스에 붙여넣기
-2. **⚡ 자동완성 실행** 클릭
-3. 우측 **OPC 양식 / MTO 양식** 탭에서 자동완성 결과 확인
-4. 빈 항목 직접 수정 후 **📋 복사** 버튼으로 클립보드 복사
-5. 사내 시스템에 붙여넣기
-
----
-
-## GitHub Pages 배포 방법
-
-1. GitHub에서 새 Repository 생성 (예: `MTO_OPC_Form`)
-2. 이 폴더의 파일 3개를 업로드:
-   - `index.html`
-   - `style.css`
-   - `app.js`
-3. Repository → **Settings** → **Pages**
-4. Source: `Deploy from a branch` → Branch: `main` → `/root` → **Save**
-5. 잠시 후 `https://<username>.github.io/<repo-name>/` 접속
-
----
-
-## 파일 구조
-
-```
-MTO_OPC_Form/
-├── index.html   # 메인 페이지
-├── style.css    # 스타일 (다크 테마)
-├── app.js       # 파싱 & 자동완성 로직
-└── README.md
-```
-
----
-
-## 표준데이터 매핑
-
-| 표준데이터 항목 | OPC 양식 | MTO 양식 |
-|---|---|---|
-| Device | ✅ | ✅ |
-| Process | ✅ | ✅ |
-| 목적 | ✅ | ✅ |
-| New lib. | ✅ | — |
-| MTO Date | Upload Date | MTO Date |
-| 귀속부서 | — | ✅ |
-| RECN | — | ✅ |
-| Mask ID / Layer (MTO 테이블) | ✅ | ✅ |
+## GitHub Pages 배포
+1. 이 저장소를 GitHub에 업로드
+2. Settings → Pages → Branch: main, folder: / (root)
+3. Save 후 배포 URL 확인

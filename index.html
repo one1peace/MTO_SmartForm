@@ -3,233 +3,484 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTO / OPC 양식 자동완성</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<title>OPC · MTO 양식 자동작성기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0c0c11;--sf:#13131c;--sf2:#191924;--sf3:#1f1f2e;
+  --bd:#26263a;--bd2:#31314a;
+  --acc:#4f8ef7;--acc2:#8c5cfc;--ok:#3dd68c;--warn:#f7c948;--err:#f74f6e;
+  --tx:#eaeaf4;--tx2:#7070a0;--tx3:#42426a;
+  --opc:#a070ff;--mto:#3dd68c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans KR',sans-serif;min-height:100vh;}
+
+header{padding:18px 36px;border-bottom:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:13px;}
+.logo{width:34px;height:34px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+header h1{font-size:15px;font-weight:700;}
+header p{font-size:11.5px;color:var(--tx2);margin-top:1px;}
+
+/* ── 2컬럼 메인 레이아웃 ── */
+.layout{display:grid;grid-template-columns:420px 1fr;gap:0;min-height:calc(100vh - 61px);}
+.left-col{border-right:1px solid var(--bd);background:var(--sf);display:flex;flex-direction:column;}
+.right-col{background:var(--bg);padding:28px 32px;overflow-y:auto;}
+
+/* ── 왼쪽 입력 영역 ── */
+.left-header{padding:20px 24px 14px;border-bottom:1px solid var(--bd);}
+.left-header h2{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:3px;}
+.left-header p{font-size:11.5px;color:var(--tx2);line-height:1.6;}
+
+.paste-wrap{flex:1;display:flex;flex-direction:column;padding:16px 20px;gap:10px;}
+textarea.paste{flex:1;min-height:340px;background:var(--sf2);border:1.5px dashed var(--bd2);border-radius:10px;padding:14px;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.75;resize:none;outline:none;transition:border-color .18s;}
+textarea.paste:focus{border-color:var(--acc);border-style:solid;}
+textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans-serif;font-size:12px;line-height:1.9;}
+
+.hint{font-size:11.5px;color:var(--tx2);line-height:1.6;}
+.hint b{color:var(--warn);}
+
+.status{padding:9px 13px;background:var(--sf3);border-radius:7px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--tx2);border:1px solid var(--bd);}
+.status .ok{color:var(--ok);}.status .err{color:var(--err);}
+
+.left-actions{padding:14px 20px 20px;display:flex;gap:8px;border-top:1px solid var(--bd);}
+
+/* ── 버튼 ── */
+.btn{padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-acc{background:var(--acc);color:#fff;flex:1;justify-content:center;}.btn-acc:hover{background:#3a7de8;}
+.btn-ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd2);}.btn-ghost:hover{color:var(--tx);}
+
+/* ── 오른쪽 미리보기 ── */
+.right-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--tx3);text-align:center;gap:10px;}
+.right-empty .icon{font-size:36px;}
+.right-empty p{font-size:13px;line-height:1.8;}
+
+.result-section{margin-bottom:28px;}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.result-title{font-size:13px;font-weight:700;}
+.result-title.opc{color:var(--opc);}.result-title.mto{color:var(--mto);}
+.copy-btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;}
+.copy-opc{background:var(--opc);color:#fff;}.copy-opc:hover{background:#8f5ce8;}
+.copy-mto{background:var(--mto);color:#0c0c11;}.copy-mto:hover{background:#2ec47a;}
+
+.preview-box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;overflow-x:auto;}
+
+.copy-all-bar{background:var(--sf2);border:1px solid var(--bd2);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
+.copy-all-bar p{font-size:12.5px;color:var(--tx2);flex:1;}
+.copy-all-bar strong{color:var(--tx);}
+.btn-all{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;padding:9px 22px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;}
+.btn-all:hover{opacity:.88;transform:translateY(-1px);}
+
+/* ── 파싱 미리보기 (왼쪽 하단) ── */
+.parsed-preview{padding:12px 20px;border-top:1px solid var(--bd);background:var(--sf);}
+.parsed-preview h3{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;}
+.kv-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;}
+.kv-row{display:flex;gap:8px;font-size:11px;}
+.kv-key{color:var(--tx2);min-width:110px;flex-shrink:0;}
+.kv-val{color:var(--tx);font-family:'IBM Plex Mono',monospace;word-break:break-all;}
+
+/* ── 토스트 ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--sf2);border:1px solid var(--bd);border-radius:9px;padding:11px 17px;font-size:13px;display:flex;align-items:center;gap:7px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:9999;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{border-color:var(--ok);color:var(--ok);}
+.toast.warn{border-color:var(--warn);color:var(--warn);}
+</style>
 </head>
 <body>
 
-<!-- ══════════════ HEADER ══════════════ -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="logo">
-      <span class="logo-mark">⬡</span>
-      <span class="logo-text">MTO <span class="logo-slash">/</span> OPC</span>
-      <span class="logo-sub">양식 자동완성</span>
-    </div>
-    <div class="header-meta">
-      <span class="chip chip-blue">Samsung DS</span>
-      <span class="chip chip-slate">DRAM 설계팀</span>
-    </div>
+<header>
+  <div class="logo">📋</div>
+  <div>
+    <h1>OPC · MTO 양식 자동작성기</h1>
+    <p>DB 기준 표 붙여넣기 → OPC · MTO 이메일 표 자동생성</p>
   </div>
 </header>
 
-<!-- ══════════════ MAIN ══════════════ -->
-<main class="main-layout">
+<div class="layout">
 
-  <!-- ── LEFT: 표준데이터 입력 ── -->
-  <section class="panel panel-left">
-    <div class="panel-head">
-      <h2 class="panel-title">
-        <span class="step-badge">01</span>
-        표준데이터 입력
-      </h2>
-      <p class="panel-desc">MTO 표준 폼 전체를 복사하여 아래에 붙여넣기 하세요.</p>
+  <!-- ── 왼쪽: 입력 ── -->
+  <div class="left-col">
+    <div class="left-header">
+      <h2>📥 DB 기준 표 붙여넣기</h2>
+      <p>기준 표 전체를 엑셀에서 복사(Ctrl+C) 후<br>아래 창에 붙여넣기(Ctrl+V) 하세요.</p>
     </div>
 
-    <div class="paste-zone" id="paste-zone">
-      <textarea id="raw-input" spellcheck="false"
-        placeholder="여기에 표준데이터를 붙여넣기 하세요 (Ctrl+V)&#10;&#10;예시)&#10;MTO Date&#9;2026-07월 예정&#10;목적&#9;VH-ver R.L.ECC 개선...&#10;Device&#9;16GLPDDR5_VHG&#10;Process&#9;D1b&#10;귀속부서&#9;DRAM 설계팀&#10;..."></textarea>
-      <div class="paste-overlay" id="paste-overlay">
-        <div class="paste-icon">⌘ V</div>
-        <div class="paste-hint">클릭 후 붙여넣기</div>
+    <div class="paste-wrap">
+      <textarea class="paste" id="paste-input"
+        placeholder="여기에 붙여넣기 하세요 (Ctrl+V)&#10;&#10;인식하는 항목:&#10;  Device / Process / 귀속부서&#10;  RECN / MTO Date / 목적&#10;  Base lib. / New lib.&#10;  Base Stream 경로&#10;  TEMP RUN 내용&#10;  Upload Step + Layer + Tooling 경로&#10;  설계 TEG변경 / History&#10;  진행률 / Upload Date&#10;  TOOLER / 특이사항"
+        oninput="onPasteInput()"></textarea>
+
+      <div class="hint">💡 탭 구분된 엑셀 데이터 그대로 사용 · <b>헤더/이모지 행 자동 스킵</b></div>
+      <div class="status" id="parse-status">대기 중 — 데이터를 붙여넣으면 자동 분석합니다.</div>
+    </div>
+
+    <div id="parsed-preview-area" style="display:none;">
+      <div class="parsed-preview">
+        <h3>인식된 항목</h3>
+        <div class="kv-list" id="kv-list"></div>
       </div>
     </div>
 
-    <div class="parse-actions">
-      <button class="btn btn-ghost" onclick="clearAll()">초기화</button>
-      <button class="btn btn-primary" onclick="parseAndFill()">
-        <span class="btn-icon">⚡</span> 자동완성 실행
-      </button>
+    <div class="left-actions">
+      <button class="btn btn-acc" onclick="generate()">✦ 양식 생성</button>
+      <button class="btn btn-ghost" onclick="clearAll()">✕ 초기화</button>
     </div>
+  </div>
 
-    <!-- 파싱 결과 미리보기 -->
-    <div class="parsed-preview" id="parsed-preview" style="display:none">
-      <div class="preview-head">파싱된 항목</div>
-      <div class="preview-grid" id="preview-grid"></div>
+  <!-- ── 오른쪽: 결과 ── -->
+  <div class="right-col" id="right-col">
+    <div class="right-empty" id="right-empty">
+      <div class="icon">📄</div>
+      <p>왼쪽에 DB 기준 표를 붙여넣고<br><strong style="color:var(--tx)">양식 생성</strong> 버튼을 누르면<br>OPC · MTO 이메일 표가 생성됩니다.</p>
     </div>
-  </section>
-
-  <!-- ── RIGHT: 양식 출력 ── -->
-  <section class="panel panel-right">
-    <div class="panel-head">
-      <h2 class="panel-title">
-        <span class="step-badge">02</span>
-        양식 출력
-      </h2>
-      <p class="panel-desc">자동완성된 결과를 확인하고 복사하세요.</p>
-    </div>
-
-    <div class="form-tab-bar">
-      <button class="form-tab active" id="tab-opc" onclick="switchForm('opc')">
-        <span class="tab-dot dot-blue"></span> OPC 양식
-      </button>
-      <button class="form-tab" id="tab-mto" onclick="switchForm('mto')">
-        <span class="tab-dot dot-green"></span> MTO 양식
-      </button>
-    </div>
-
-    <!-- ── OPC Form ── -->
-    <div class="form-body active" id="form-opc">
-
-      <div class="form-section">
-        <div class="section-label accent-blue">DB 기본 정보</div>
-        <div class="field-grid">
-          <div class="field">
-            <label>Device</label>
-            <input id="opc-device" type="text" placeholder="예) 12GLPDDR5_VLG">
-          </div>
-          <div class="field">
-            <label>Process</label>
-            <input id="opc-process" type="text" placeholder="예) D1b">
-          </div>
-          <div class="field field-full">
-            <label>New lib.</label>
-            <input id="opc-newlib" type="text" class="mono" placeholder="예) D1B_12GLPDDR5_VLG_L45_S10_...">
-          </div>
+    <div id="right-result" style="display:none;">
+      <div class="copy-all-bar">
+        <p><strong>OPC + MTO 통합 복사</strong> — 이메일에 한 번에 붙여넣기</p>
+        <button class="btn-all" onclick="copyAll()">📋 OPC + MTO 모두 복사</button>
+      </div>
+      <div class="result-section">
+        <div class="result-header">
+          <div class="result-title opc">OPC 양식</div>
+          <button class="copy-btn copy-opc" onclick="copyTable('opc')">📋 복사</button>
         </div>
+        <div class="preview-box" id="tbl-opc"></div>
       </div>
-
-      <div class="form-section">
-        <div class="section-label accent-blue">OPC 정보</div>
-        <div class="field-grid">
-          <div class="field field-full">
-            <label>목적</label>
-            <input id="opc-purpose" type="text" placeholder="예) R.L ECC개선으로 mn0 소자 변경">
-          </div>
-          <div class="field">
-            <label>설계 TEG 변경</label>
-            <input id="opc-teg" type="text" placeholder="O / X">
-          </div>
-          <div class="field">
-            <label>History</label>
-            <input id="opc-history" type="text" placeholder="LINK">
-          </div>
-          <div class="field">
-            <label>진행률</label>
-            <input id="opc-progress" type="text" placeholder="예) 1/1 (100.00%)">
-          </div>
-          <div class="field">
-            <label>Upload Date</label>
-            <input id="opc-date" type="text" placeholder="예) 06월 05일 15:35">
-          </div>
+      <div class="result-section">
+        <div class="result-header">
+          <div class="result-title mto">MTO 양식</div>
+          <button class="copy-btn copy-mto" onclick="copyTable('mto')">📋 복사</button>
         </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-label accent-orange">Mask 정보</div>
-        <div class="mask-table-wrap">
-          <table class="mask-table">
-            <thead>
-              <tr>
-                <th>Mask ID (PSM 포함)</th>
-                <th>Layer</th>
-                <th>SEEDS Verification</th>
-                <th>특이사항 Comment</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="opc-mask-body"></tbody>
-          </table>
-        </div>
-        <button class="btn btn-add-row" onclick="addRow('opc')">+ 행 추가</button>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-ghost" onclick="resetForm('opc')">초기화</button>
-        <button class="btn btn-copy btn-copy-blue" onclick="copyForm('opc')">
-          📋 OPC 양식 복사
-        </button>
+        <div class="preview-box" id="tbl-mto"></div>
       </div>
     </div>
+  </div>
 
-    <!-- ── MTO Form ── -->
-    <div class="form-body" id="form-mto">
+</div>
 
-      <div class="form-section">
-        <div class="section-label accent-green">DB 기본 정보</div>
-        <div class="field-grid">
-          <div class="field">
-            <label>Device</label>
-            <input id="mto-device" type="text" placeholder="예) 12GLPDDR5_VLG">
-          </div>
-          <div class="field">
-            <label>Process</label>
-            <input id="mto-process" type="text" placeholder="예) D1b">
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-label accent-green">MTO 정보</div>
-        <div class="field-grid">
-          <div class="field field-full">
-            <label>목적</label>
-            <input id="mto-purpose" type="text" placeholder="예) R.L ECC개선으로 mn0 소자 변경">
-          </div>
-          <div class="field">
-            <label>귀속부서</label>
-            <input id="mto-dept" type="text" placeholder="예) DRAM 설계팀">
-          </div>
-          <div class="field">
-            <label>RECN</label>
-            <input id="mto-recn" type="text" placeholder="LINK">
-          </div>
-          <div class="field">
-            <label>진행률</label>
-            <input id="mto-progress" type="text" placeholder="예) 1/1 (100.00%)">
-          </div>
-          <div class="field">
-            <label>MTO Date</label>
-            <input id="mto-date" type="text" placeholder="예) 06월 05일 15:35">
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-label accent-orange">Mask / Layer 정보</div>
-        <div class="mask-table-wrap">
-          <table class="mask-table">
-            <thead>
-              <tr>
-                <th>Mask ID (PSM 포함)</th>
-                <th>Layer</th>
-                <th>SEEDS Verification</th>
-                <th>특이사항 Comment</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="mto-mask-body"></tbody>
-          </table>
-        </div>
-        <button class="btn btn-add-row" onclick="addRow('mto')">+ 행 추가</button>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-ghost" onclick="resetForm('mto')">초기화</button>
-        <button class="btn btn-copy btn-copy-green" onclick="copyForm('mto')">
-          📋 MTO 양식 복사
-        </button>
-      </div>
-    </div>
-
-  </section>
-</main>
-
-<!-- ══════════════ TOAST ══════════════ -->
 <div class="toast" id="toast"></div>
 
-<script src="app.js"></script>
+<script>
+// ════════════════════════════════════════
+// 파싱 엔진
+// ════════════════════════════════════════
+
+let DATA = {};  // 파싱 결과 전역 저장
+let MTO_LAYERS = []; // [{step, layer, tooling, seeds, comment}]
+
+function onPasteInput() {
+  const raw = document.getElementById('paste-input').value;
+  if(!raw.trim()) {
+    document.getElementById('parse-status').innerHTML = '대기 중 — 데이터를 붙여넣으면 자동 분석합니다.';
+    document.getElementById('parsed-preview-area').style.display = 'none';
+    return;
+  }
+  const {data, layers, count} = parseSource(raw);
+  DATA = data;
+  MTO_LAYERS = layers;
+
+  // 인식 상태 표시
+  document.getElementById('parse-status').innerHTML =
+    `<span class="ok">✓ ${count}개 항목 인식 · MTO Layer ${layers.length}행</span>`;
+
+  // KV 미리보기
+  const kvList = document.getElementById('kv-list');
+  kvList.innerHTML = '';
+  Object.entries(data).forEach(([k,v]) => {
+    if(!v) return;
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `<span class="kv-key">${k}</span><span class="kv-val">${String(v).slice(0,60)}${String(v).length>60?'…':''}</span>`;
+    kvList.appendChild(row);
+  });
+  layers.forEach((l,i) => {
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `<span class="kv-key">Layer행 ${i+1}</span><span class="kv-val">${l.step} / ${l.layer}</span>`;
+    kvList.appendChild(row);
+  });
+
+  document.getElementById('parsed-preview-area').style.display = 'block';
+}
+
+function parseSource(raw) {
+  const lines = raw.split('\n').map(l => l.split('\t').map(c => c.trim()));
+  const data = {};
+  const layers = [];
+
+  // 헤더 감지 패턴 (스킵할 행)
+  const skipPat = /^[🗂📚📁⚠️✅🎭※\s#\-=]+/;
+
+  // MTO 레이어 섹션 감지 상태
+  let inMtoLayer = false;
+
+  lines.forEach(cols => {
+    const full = cols.join('\t');
+    const c0 = cols[0]||'', c1 = cols[1]||'', c2 = cols[2]||'', c3 = cols[3]||'';
+
+    // 빈 행 스킵
+    if(cols.every(c=>!c)) return;
+
+    // 이모지/헤더 행 스킵
+    if(skipPat.test(c0) && !c1) return;
+
+    // MTO 레이어 헤더 행 감지
+    const fullLower = full.toLowerCase();
+    if(fullLower.includes('upload step') && fullLower.includes('layer')) {
+      inMtoLayer = true; return;
+    }
+
+    // 섹션 제목 행 스킵 (📁 Base Stream 경로 등)
+    if(/^[\u{1F000}-\u{1FFFF}]/u.test(c0)) return;
+
+    // MTO 레이어 데이터 행
+    if(inMtoLayer) {
+      // 빈 행이면 섹션 종료
+      if(!c0 && !c1) { inMtoLayer = false; return; }
+      // Step / Layer / Tooling / SEEDS / Comment
+      if(c0 || c1) {
+        layers.push({
+          step: c0, layer: c1, tooling: c2, seeds: c3,
+          comment: cols[4]||''
+        });
+      }
+      return;
+    }
+
+    // ── 키-값 파싱 ──
+    const key = c0.replace(/"/g,'').replace(/\n/g,' ').trim();
+    const keyN = key.toLowerCase().replace(/[\s_\-\.]/g,'');
+
+    // 2열 구조 (key | val) 또는 4열 (k|v|k|v)
+    const tryMatch = (k, v) => {
+      const kn = k.toLowerCase().replace(/[\s_\-\.·"]/g,'');
+      if(!kn) return;
+
+      if(kn.includes('device'))           data.device      = v;
+      else if(kn.includes('process'))     data.process     = v;
+      else if(kn==='recn'||kn==='recn')   { if(!data.recn) data.recn = v; }
+      else if(kn.includes('귀속부서'))     data.dept        = v;
+      else if(kn.includes('tooler'))       data.tooler      = v;
+      else if(kn.includes('mtodate')||kn.includes('mto date')) data.mtoDate = v;
+      else if(kn.includes('목적')||kn.includes('업로드사유')) data.purpose  = v;
+      else if(kn.includes('baselib'))      data.baseLib     = v;
+      else if(kn.includes('newlib'))       data.newLib      = v;
+      else if(kn.includes('stream경로')||kn.includes('stream')) data.stream  = v;
+      else if(kn.includes('temp')&&kn.includes('내용')) data.tempContent = v;
+      else if(kn.includes('temprun')||kn.includes('temp경로')) data.tempPath = v;
+      else if(kn.includes('temp비고'))     data.tempNote    = v;
+      else if(kn.includes('db작업')||kn.includes('담당자')) data.dbWorker  = v;
+      else if(kn.includes('lvs경로')||kn==='lvs') data.lvs = v;
+      else if(kn.includes('drc경로')||kn==='drc') data.drc = v;
+      else if(kn.includes('lvl경로')||kn==='lvl') data.lvl = v;
+      else if(kn.includes('설계teg')||kn.includes('teg변경')) data.teg = v;
+      else if(kn.includes('history'))      data.history     = v;
+      else if(kn.includes('진행률'))       data.progress    = v;
+      else if(kn.includes('uploaddate')||kn.includes('upload date')) data.uploadDate = v;
+      else if(kn.includes('basemask')||( kn.includes('mask')&&kn.includes('base'))) data.baseMask = v;
+      else if(kn.includes('newmask')||( kn.includes('mask')&&kn.includes('new')))  data.newMask  = v;
+      // Base Mask / New Mask (Library 섹션 내 Mask 행)
+      else if(kn==='mask'||kn.includes('mask')) {
+        if(!data.baseMask) data.baseMask = v;
+        else if(!data.newMask) data.newMask = v;
+      }
+    };
+
+    // col0/col1 쌍
+    tryMatch(c0, c1);
+    // col2/col3 쌍 (4열 구조)
+    if(c2) tryMatch(c2, c3);
+
+    // Base lib / New lib 아래 Mask 행 특별 처리
+    if(keyN === 'mask' || c0.trim().toLowerCase()==='mask') {
+      if(!data.baseMask) data.baseMask = c1 || c0;
+      else data.newMask = c1 || c0;
+    }
+    // lib 라인 아래 다음줄 mask 감지
+    if(key.includes('Mask') && !c0.includes('Mask ID')) {
+      if(data.baseLib && !data.baseMask) data.baseMask = c1||c2||c3;
+      else if(data.newLib  && !data.newMask)  data.newMask  = c1||c2||c3;
+    }
+  });
+
+  // Base → New Step 자동계산
+  if(!data.newStep && data.baseLib && data.newLib) {
+    // lib명에서 step 추출 (예: L89_S14 → L90_S15)
+    const bm = data.baseLib.match(/_([A-Z]\d+_[A-Z]\d+[A-Za-z]?)_/);
+    const nm = data.newLib.match(/_([A-Z]\d+_[A-Z]\d+[A-Za-z]?)_/);
+    if(bm) data.baseStep = bm[1];
+    if(nm) data.newStep  = nm[1];
+  }
+
+  const count = Object.values(data).filter(v=>v).length;
+  return {data, layers, count};
+}
+
+// ════════════════════════════════════════
+// 이메일 테이블 빌더
+// ════════════════════════════════════════
+const CLR = {
+  opc:{hd:'#221050',catA:'#e0d8f8',catB:'#d5ccf4',rowA:'#f7f5fd',rowB:'#f0edfb'},
+  mto:{hd:'#0b3320',catA:'#caeadb',catB:'#bde0ce',rowA:'#f0faf5',rowB:'#e6f5ee'},
+};
+
+function buildTable(form, rows) {
+  const c = CLR[form];
+  const title = form==='opc'?'OPC 양식':'MTO 양식';
+
+  // 그룹핑
+  const groups=[];let cur=null,items=[];
+  rows.forEach(r=>{
+    if(!r.cat&&!r.sub) return;
+    if(r.cat!==cur){if(cur!==null)groups.push({cat:cur,items});cur=r.cat;items=[];}
+    items.push({sub:r.sub,val:r.val});
+  });
+  if(cur!==null)groups.push({cat:cur,items});
+
+  let h = `<table style="border-collapse:collapse;width:100%;font-family:Arial,'Malgun Gothic',sans-serif;font-size:13px;border:1.5px solid #b8c0dc;">`;
+  h += `<tr><td colspan="3" style="background:${c.hd};color:#fff;padding:12px 16px;font-size:14px;font-weight:700;letter-spacing:0.2px;">New &nbsp;|&nbsp; ${title}</td></tr>`;
+  h += `<tr>
+    <td style="background:#e4e8f4;color:#222;padding:8px 14px;font-weight:700;font-size:12px;border-bottom:2px solid #b8c0dc;border-right:1px solid #b8c0dc;width:18%;">대분류</td>
+    <td style="background:#e4e8f4;color:#222;padding:8px 14px;font-weight:700;font-size:12px;border-bottom:2px solid #b8c0dc;border-right:1px solid #b8c0dc;width:22%;">소분류</td>
+    <td style="background:#e4e8f4;color:#222;padding:8px 14px;font-weight:700;font-size:12px;border-bottom:2px solid #b8c0dc;">값</td>
+  </tr>`;
+
+  groups.forEach((g,gi)=>{
+    const ev=gi%2===0;
+    const catBg=ev?c.catA:c.catB,rowBg=ev?c.rowA:c.rowB;
+    g.items.forEach((item,ii)=>{
+      const last=(ii===g.items.length-1)&&(gi===groups.length-1);
+      const bd=last?'none':'1px solid #cdd4ec';
+      const val=(item.val||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      const display = val||'<span style="color:#bbb;">—</span>';
+      h+='<tr>';
+      if(ii===0) h+=`<td rowspan="${g.items.length}" style="background:${catBg};color:#1a2060;padding:10px 12px;font-weight:700;font-size:12px;vertical-align:middle;text-align:center;border-right:2px solid #b8c0dc;border-bottom:${bd};">${g.cat}</td>`;
+      h+=`<td style="background:${rowBg};color:#333;padding:9px 13px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:500;">${item.sub}</td>`;
+      h+=`<td style="background:#fff;color:#111;padding:9px 13px;border-bottom:${bd};word-break:break-all;line-height:1.55;">${display}</td>`;
+      h+='</tr>';
+    });
+  });
+  h+='</table>';
+  return h;
+}
+
+// ════════════════════════════════════════
+// 양식 생성
+// ════════════════════════════════════════
+function generate() {
+  const raw = document.getElementById('paste-input').value;
+  if(!raw.trim()){showToast('데이터를 먼저 붙여넣어 주세요.','warn');return;}
+
+  const {data, layers} = parseSource(raw);
+  DATA = data; MTO_LAYERS = layers;
+
+  const d = data;
+
+  // ── OPC 양식 ──
+  const opcRows = [
+    {cat:'DB', sub:'Device',       val:d.device},
+    {cat:'DB', sub:'Process',      val:d.process},
+    {cat:'DB', sub:'New Lib.',     val:d.newLib},
+    {cat:'OPC', sub:'목적',        val:d.purpose},
+    {cat:'OPC', sub:'설계 TEG변경',val:d.teg||''},
+    {cat:'OPC', sub:'History',     val:d.history||'LINK'},
+    {cat:'OPC', sub:'진행률',      val:d.progress},
+    {cat:'OPC', sub:'Upload Date', val:d.uploadDate},
+    // Layer 행들
+    ...layers.map((l,i) => ({
+      cat: i===0 ? 'Mask ID (PSM 포함)' : '',
+      sub: l.step,
+      val: `Layer: ${l.layer}${l.seeds?' | SEEDS: '+l.seeds:''}${l.comment?' | '+l.comment:''}`
+    })),
+  ];
+
+  // Layer 헤더 행 삽입
+  if(layers.length>0) {
+    opcRows.splice(opcRows.findIndex(r=>r.cat==='Mask ID (PSM 포함)')+0,0,
+      {cat:'Mask ID (PSM 포함)', sub:'Layer', val:'SEEDS Verification / 특이사항 Comment'}
+    );
+  }
+
+  // ── MTO 양식 ──
+  const mtoRows = [
+    {cat:'DB', sub:'Device',    val:d.device},
+    {cat:'DB', sub:'Process',   val:d.process},
+    {cat:'MTO', sub:'목적',     val:d.purpose},
+    {cat:'MTO', sub:'귀속부서', val:d.dept},
+    {cat:'MTO', sub:'RECN',     val:d.recn||'LINK'},
+    {cat:'MTO', sub:'진행률',   val:d.progress},
+    {cat:'MTO', sub:'MTO Date', val:d.mtoDate},
+    // Layer 행들
+    ...layers.map((l,i) => ({
+      cat: i===0 ? 'Mask ID (PSM 포함)' : '',
+      sub: l.step,
+      val: `Layer: ${l.layer}${l.seeds?' | SEEDS: '+l.seeds:''}${l.comment?' | '+l.comment:''}`
+    })),
+  ];
+
+  if(layers.length>0) {
+    mtoRows.splice(mtoRows.findIndex(r=>r.cat==='Mask ID (PSM 포함)')+0,0,
+      {cat:'Mask ID (PSM 포함)', sub:'Layer', val:'SEEDS Verification / 특이사항 Comment'}
+    );
+  }
+
+  document.getElementById('tbl-opc').innerHTML = buildTable('opc', opcRows);
+  document.getElementById('tbl-mto').innerHTML = buildTable('mto', mtoRows);
+
+  document.getElementById('right-empty').style.display  = 'none';
+  document.getElementById('right-result').style.display = 'block';
+  showToast('OPC · MTO 양식 생성 완료!','ok');
+}
+
+// ════════════════════════════════════════
+// 복사
+// ════════════════════════════════════════
+async function copyTable(form) {
+  const el = document.getElementById('tbl-'+form);
+  if(!el||!el.innerHTML){showToast('표가 없습니다.','warn');return;}
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([el.innerHTML],{type:'text/html'}),
+      'text/plain':new Blob([el.innerText], {type:'text/plain'}),
+    })]);
+    showToast(form.toUpperCase()+' 표 복사 완료! 이메일에 붙여넣기 하세요.','ok');
+  } catch(e) {
+    const sel=window.getSelection(),r=document.createRange();
+    r.selectNodeContents(el);sel.removeAllRanges();sel.addRange(r);
+    document.execCommand('copy');sel.removeAllRanges();
+    showToast(form.toUpperCase()+' 복사 완료!','ok');
+  }
+}
+
+async function copyAll() {
+  const opc = document.getElementById('tbl-opc');
+  const mto = document.getElementById('tbl-mto');
+  if(!opc.innerHTML){showToast('먼저 양식을 생성하세요.','warn');return;}
+  const html = opc.innerHTML + '<br><br>' + mto.innerHTML;
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([html],{type:'text/html'}),
+      'text/plain':new Blob([opc.innerText+'\n\n'+mto.innerText],{type:'text/plain'}),
+    })]);
+    showToast('OPC + MTO 표 복사 완료! 이메일에 붙여넣기 하세요.','ok');
+  } catch(e) {showToast('복사 실패 — 개별 복사를 이용해 주세요.','warn');}
+}
+
+function clearAll() {
+  document.getElementById('paste-input').value = '';
+  document.getElementById('parse-status').innerHTML = '대기 중 — 데이터를 붙여넣으면 자동 분석합니다.';
+  document.getElementById('parsed-preview-area').style.display='none';
+  document.getElementById('right-empty').style.display='block';
+  document.getElementById('right-result').style.display='none';
+  document.getElementById('tbl-opc').innerHTML='';
+  document.getElementById('tbl-mto').innerHTML='';
+  DATA={}; MTO_LAYERS=[];
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=(type==='ok'?'✓ ':'⚠ ')+msg;
+  t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
 </body>
 </html>
