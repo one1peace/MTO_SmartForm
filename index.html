@@ -336,7 +336,7 @@ function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&
 
 function buildTable(form, rows) {
   const c = CLR[form];
-  const title = form==='opc'?'OPC 양식':'MTO 양식';
+  const title = form==='opc'?'OPC':'MTO';
 
   // 대분류 그룹핑
   const groups=[];let cur=null,items=[];
@@ -349,12 +349,12 @@ function buildTable(form, rows) {
 
   // 컬럼 구조: 대분류 | 소분류1 | 값1 | 소분류2 | 값2  (총 5열)
   let h = `<table style="border-collapse:collapse;width:100%;font-family:Arial,'Malgun Gothic',sans-serif;font-size:13px;border:1.5px solid #b8c0dc;">`;
-  h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:11px 16px;font-size:14px;font-weight:700;">New &nbsp;|&nbsp; ${title}</td></tr>`;
+  h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:11px 16px;font-size:14px;font-weight:700;">${title}</td></tr>`;
 
   groups.forEach((g,gi)=>{
     const ev=gi%2===0;
     const catBg=ev?c.catA:c.catB, rowBg=ev?c.rowA:c.rowB;
-    const rs = g.items.filter(r=>!r.isHeader&&!r.isLayer).length;
+    const rs = g.items.length;  // OPC/MTO 단일 대분류 — 전체 행 rowspan
 
     g.items.forEach((row,ii)=>{
       const isLast=(ii===g.items.length-1)&&(gi===groups.length-1);
@@ -368,49 +368,46 @@ function buildTable(form, rows) {
       h += '<tr>';
 
       // ── 대분류 셀 (첫 행만 rowspan, 레이어행은 빈 셀로 한 칸 밀기) ──
-      if(ii===0 && !isLayer && !isHdr){
+      if(ii===0){
         const catDisplay = (g.cat||'').replace(/\n/g,'<br>');
         h += `<td rowspan="${rs}" style="background:${catBg};color:#1a2060;padding:9px 11px;font-weight:700;font-size:12px;vertical-align:middle;text-align:center;border-right:2px solid #b8c0dc;border-bottom:${bd};white-space:pre-line;min-width:80px;">${catDisplay}</td>`;
       }
 
-      // ── 헤더 행: DB|OPC 또는 DB|MTO 2칸만, Step은 3번째 칸부터 ──
+      // ── 헤더 행 (Step/Layer 컬럼 타이틀) — 대분류 rowspan 셀 아래에 종속 ──
       if(isHdr){
-        const catLabel = form==='opc' ? 'DB | OPC' : 'DB | MTO';
-        // 왼쪽 2칸: DB/OPC 또는 DB/MTO 병합
-        h += `<td colspan="2" style="background:${c.hd};color:#fff;padding:8px 12px;border-right:2px solid rgba(255,255,255,0.3);border-bottom:${bd};font-weight:700;text-align:center;">${catLabel}</td>`;
-        // 3번째 칸: Step (빈칸 1개 추가해서 오른쪽으로 이동)
-        h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.2);border-bottom:${bd};font-weight:700;">${esc(row.sub)}</td>`;
+        // 대분류 셀 없음(rowspan에 포함됨) — 소분류 자리에 Step 타이틀
+        h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:700;">${esc(row.sub)}</td>`;
         if(form==='opc'){
-          // OPC: Layer + Verify 특이사항 colspan 2
+          // OPC 헤더: Step | Layer 2칸만 (Verify 특이사항은 별도 행)
           const v1 = esc(row.val1);
-          h += `<td colspan="2" style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${v1||''} &nbsp;/&nbsp; ${esc(row.sub2||'')}</td>`;
+          h += `<td colspan="3" style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${v1||''}</td>`;
         } else {
-          // MTO: Layer / SEEDS / 특이사항
+          // MTO: Layer / SEEDS Verification / 특이사항 Comment
           const v1 = esc(row.val1);
-          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.2);border-bottom:${bd};font-weight:700;">${v1||''}</td>`;
-          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${esc(row.sub2||'')} / ${esc(row.val2||'')}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:700;">${v1||''}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:700;">${esc(row.sub2||'')}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${esc(row.val2||'')}</td>`;
         }
         h += '</tr>';
         return;
       }
 
-      // ── 레이어 데이터 행: 왼쪽 2칸 비우고 Step부터 오른쪽 ──
+      // ── 레이어 데이터 행 — 대분류 rowspan 셀 아래 종속, 대분류 셀 없음 ──
       if(isLayer){
-        // 왼쪽 2칸 빈 셀 (DB|OPC·DB|MTO 칸 아래)
-        h += `<td colspan="2" style="background:${rowBg};border-right:2px solid #b8c0dc;border-bottom:${bd};"></td>`;
-        // Step 값
+        // Step 값 (소분류 자리)
         h += `<td style="background:${rowBg};color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:600;">${esc(row.sub)}</td>`;
         if(form==='opc'){
-          // OPC: Layer값 + Verify 특이사항 colspan 2
+          // OPC 데이터: Layer값만 colspan 3
           const v1 = esc(row.val1);
-          h += `<td colspan="2" style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td colspan="3" style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
         } else {
           // MTO: Layer / SEEDS(색칠) / 특이사항(색칠)
           const v1 = esc(row.val1);
           const seedsVal = esc(row.sub2||'');
           const commentVal = esc(row.val2||'');
           h += `<td style="background:#fff;color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
-          h += `<td style="background:#dff5e8;color:#0a4020;padding:8px 12px;border-bottom:${bd};font-weight:500;">${seedsVal||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td style="background:#dff5e8;color:#0a4020;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:500;">${seedsVal||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td style="background:#eafaf1;color:#0a4020;padding:8px 12px;border-bottom:${bd};word-break:break-all;">${commentVal||'<span style="color:#bbb;">—</span>'}</td>`;
         }
         h += '</tr>';
         return;
@@ -447,25 +444,25 @@ function generate() {
 
   const d = data;
 
-  // ── OPC 양식 ──
+  // ── OPC 양식 — 모두 'OPC' 대분류로 통합 ──
   const opcRows = [
-    {cat:'DB',  sub:'Device',        val1:d.device,    sub2:'Process',     val2:d.process},
-    {cat:'DB',  sub:'New Lib.',       val1:d.newLib,    sub2:'',            val2:'', wideVal:true},
+    {cat:'OPC', sub:'Device',        val1:d.device,    sub2:'Process',     val2:d.process},
+    {cat:'OPC', sub:'New Lib.',       val1:d.newLib,    sub2:'',            val2:'', wideVal:true},
     {cat:'OPC', sub:'목적',           val1:d.purpose,   sub2:'',            val2:'', wideVal:true},
     {cat:'OPC', sub:'설계 TEG변경',   val1:d.teg||'',   sub2:'History',     val2:d.history||'LINK'},
     {cat:'OPC', sub:'진행률',         val1:d.progress,  sub2:'Upload Date', val2:d.uploadDate||''},
   ];
-  // Mask/Layer 헤더 + 데이터 행
   if(layers.length>0) {
-    opcRows.push({cat:'OPC', sub:'Step', val1:'Layer', sub2:'Verify 특이사항', val2:'', isHeader:true});
+    opcRows.push({cat:'OPC', sub:'Step', val1:'Layer', sub2:'', val2:'', isHeader:true});
     layers.forEach(l => {
-      opcRows.push({cat:'OPC', sub:l.step, val1:l.layer, sub2:l.verifyNote||d.verifyNote||'', val2:'', isLayer:true});
+      opcRows.push({cat:'OPC', sub:l.step, val1:l.layer, sub2:'', val2:'', isLayer:true});
     });
+    opcRows.push({cat:'OPC', sub:'Verify 특이사항', val1:d.verifyNote||'', sub2:'', val2:'', wideVal:true});
   }
 
-  // ── MTO 양식 ──
+  // ── MTO 양식 — 모두 'MTO' 대분류로 통합 ──
   const mtoRows = [
-    {cat:'DB',  sub:'Device',    val1:d.device,       sub2:'Process',   val2:d.process},
+    {cat:'MTO', sub:'Device',    val1:d.device,       sub2:'Process',   val2:d.process},
     {cat:'MTO', sub:'목적',      val1:d.purpose,      sub2:'',          val2:'', wideVal:true},
     {cat:'MTO', sub:'귀속부서',  val1:d.dept||'',     sub2:'RECN',      val2:d.recn||'LINK'},
     {cat:'MTO', sub:'진행률',    val1:d.progress||'', sub2:'MTO Date',  val2:d.mtoDate||''},
