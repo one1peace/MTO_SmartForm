@@ -338,7 +338,7 @@ function buildTable(form, rows) {
   const c = CLR[form];
   const title = form==='opc'?'OPC 양식':'MTO 양식';
 
-  // 대분류 그룹핑 (cat 기준 rowspan 계산)
+  // 대분류 그룹핑
   const groups=[];let cur=null,items=[];
   rows.forEach(r=>{
     const cat = r.cat;
@@ -347,38 +347,87 @@ function buildTable(form, rows) {
   });
   if(cur!==null)groups.push({cat:cur,items});
 
-  // colspan=5 (대분류 | 소분류1 | 값1 | 소분류2 | 값2)
+  // 컬럼 구조: 대분류 | 소분류1 | 값1 | 소분류2 | 값2  (총 5열)
   let h = `<table style="border-collapse:collapse;width:100%;font-family:Arial,'Malgun Gothic',sans-serif;font-size:13px;border:1.5px solid #b8c0dc;">`;
   h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:11px 16px;font-size:14px;font-weight:700;">New &nbsp;|&nbsp; ${title}</td></tr>`;
 
   groups.forEach((g,gi)=>{
     const ev=gi%2===0;
     const catBg=ev?c.catA:c.catB, rowBg=ev?c.rowA:c.rowB;
-    const rs = g.items.length;
+    const rs = g.items.filter(r=>!r.isHeader&&!r.isLayer).length;
 
     g.items.forEach((row,ii)=>{
       const isLast=(ii===g.items.length-1)&&(gi===groups.length-1);
       const bd = isLast?'none':'1px solid #cdd4ec';
-      const isHdr = row.isHeader;
-      const sub1bg = isHdr ? '#e0e8f8' : rowBg;
-      const sub2bg = isHdr ? '#e0e8f8' : rowBg;
+      const isHdr  = row.isHeader;  // Mask ID/Layer 헤더행
+      const isLayer = row.isLayer;  // 실제 레이어 데이터행
+      const hdrBg  = '#e0e8f8';
+      const sub1bg = isHdr ? hdrBg : rowBg;
+      const sub2bg = isHdr ? hdrBg : rowBg;
 
       h += '<tr>';
-      // 대분류 셀 (첫 행만, rowspan)
-      if(ii===0){
+
+      // ── 대분류 셀 (첫 행만 rowspan, 레이어행은 빈 셀로 한 칸 밀기) ──
+      if(ii===0 && !isLayer && !isHdr){
         const catDisplay = (g.cat||'').replace(/\n/g,'<br>');
         h += `<td rowspan="${rs}" style="background:${catBg};color:#1a2060;padding:9px 11px;font-weight:700;font-size:12px;vertical-align:middle;text-align:center;border-right:2px solid #b8c0dc;border-bottom:${bd};white-space:pre-line;min-width:80px;">${catDisplay}</td>`;
       }
-      // 소분류1
-      h += `<td style="background:${sub1bg};color:#222;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:${isHdr?'700':'500'};width:18%;">${esc(row.sub)}</td>`;
-      // 값1
+
+      // ── 헤더 행: DB|OPC 또는 DB|MTO 2칸만, Step은 3번째 칸부터 ──
+      if(isHdr){
+        const catLabel = form==='opc' ? 'DB | OPC' : 'DB | MTO';
+        // 왼쪽 2칸: DB/OPC 또는 DB/MTO 병합
+        h += `<td colspan="2" style="background:${c.hd};color:#fff;padding:8px 12px;border-right:2px solid rgba(255,255,255,0.3);border-bottom:${bd};font-weight:700;text-align:center;">${catLabel}</td>`;
+        // 3번째 칸: Step (빈칸 1개 추가해서 오른쪽으로 이동)
+        h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.2);border-bottom:${bd};font-weight:700;">${esc(row.sub)}</td>`;
+        if(form==='opc'){
+          // OPC: Layer + Verify 특이사항 colspan 2
+          const v1 = esc(row.val1);
+          h += `<td colspan="2" style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${v1||''} &nbsp;/&nbsp; ${esc(row.sub2||'')}</td>`;
+        } else {
+          // MTO: Layer / SEEDS / 특이사항
+          const v1 = esc(row.val1);
+          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-right:1px solid rgba(255,255,255,0.2);border-bottom:${bd};font-weight:700;">${v1||''}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:8px 12px;border-bottom:${bd};font-weight:700;">${esc(row.sub2||'')} / ${esc(row.val2||'')}</td>`;
+        }
+        h += '</tr>';
+        return;
+      }
+
+      // ── 레이어 데이터 행: 왼쪽 2칸 비우고 Step부터 오른쪽 ──
+      if(isLayer){
+        // 왼쪽 2칸 빈 셀 (DB|OPC·DB|MTO 칸 아래)
+        h += `<td colspan="2" style="background:${rowBg};border-right:2px solid #b8c0dc;border-bottom:${bd};"></td>`;
+        // Step 값
+        h += `<td style="background:${rowBg};color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:600;">${esc(row.sub)}</td>`;
+        if(form==='opc'){
+          // OPC: Layer값 + Verify 특이사항 colspan 2
+          const v1 = esc(row.val1);
+          h += `<td colspan="2" style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+        } else {
+          // MTO: Layer / SEEDS(색칠) / 특이사항(색칠)
+          const v1 = esc(row.val1);
+          const seedsVal = esc(row.sub2||'');
+          const commentVal = esc(row.val2||'');
+          h += `<td style="background:#fff;color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td style="background:#dff5e8;color:#0a4020;padding:8px 12px;border-bottom:${bd};font-weight:500;">${seedsVal||'<span style="color:#bbb;">—</span>'}</td>`;
+        }
+        h += '</tr>';
+        return;
+      }
+
+      // ── 일반 행 ──
+      h += `<td style="background:${sub1bg};color:#222;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:500;width:18%;">${esc(row.sub)}</td>`;
       const v1 = esc(row.val1);
-      h += `<td style="background:#fff;color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};word-break:break-all;line-height:1.5;width:28%;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
-      // 소분류2
-      h += `<td style="background:${sub2bg};color:#222;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:${isHdr?'700':'500'};width:18%;">${esc(row.sub2||'')}</td>`;
-      // 값2
-      const v2 = esc(row.val2);
-      h += `<td style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;width:28%;">${v2||'<span style="color:#bbb;">—</span>'}</td>`;
+      if(row.wideVal){
+        // New Lib. / 목적: 값 칸을 나머지 3칸 병합
+        h += `<td colspan="3" style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+      } else {
+        h += `<td style="background:#fff;color:#111;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};word-break:break-all;line-height:1.5;width:22%;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+        h += `<td style="background:${sub2bg};color:#222;padding:8px 12px;border-right:1px solid #cdd4ec;border-bottom:${bd};font-weight:500;width:18%;">${esc(row.sub2||'')}</td>`;
+        const v2 = esc(row.val2);
+        h += `<td style="background:#fff;color:#111;padding:8px 12px;border-bottom:${bd};word-break:break-all;line-height:1.5;width:22%;">${v2||'<span style="color:#bbb;">—</span>'}</td>`;
+      }
       h += '</tr>';
     });
   });
@@ -400,31 +449,31 @@ function generate() {
 
   // ── OPC 양식 ──
   const opcRows = [
-    {cat:'DB', sub:'Device',    val1:d.device,    sub2:'Process',      val2:d.process},
-    {cat:'DB', sub:'New Lib.',  val1:d.newLib,    sub2:'',             val2:''},
-    {cat:'OPC', sub:'목적',     val1:d.purpose,   sub2:'',             val2:''},
-    {cat:'OPC', sub:'설계 TEG변경', val1:d.teg||'', sub2:'History',   val2:d.history||'LINK'},
-    {cat:'OPC', sub:'진행률',   val1:d.progress,  sub2:'Upload Date',  val2:d.uploadDate||''},
+    {cat:'DB',  sub:'Device',        val1:d.device,    sub2:'Process',     val2:d.process},
+    {cat:'DB',  sub:'New Lib.',       val1:d.newLib,    sub2:'',            val2:'', wideVal:true},
+    {cat:'OPC', sub:'목적',           val1:d.purpose,   sub2:'',            val2:'', wideVal:true},
+    {cat:'OPC', sub:'설계 TEG변경',   val1:d.teg||'',   sub2:'History',     val2:d.history||'LINK'},
+    {cat:'OPC', sub:'진행률',         val1:d.progress,  sub2:'Upload Date', val2:d.uploadDate||''},
   ];
   // Mask/Layer 헤더 + 데이터 행
   if(layers.length>0) {
-    opcRows.push({cat:'Mask ID\n(PSM 포함)', sub:'Layer', val1:'', sub2:'Verify 특이사항', val2:'', isHeader:true});
+    opcRows.push({cat:'OPC', sub:'Step', val1:'Layer', sub2:'Verify 특이사항', val2:'', isHeader:true});
     layers.forEach(l => {
-      opcRows.push({cat:'', sub:l.step, val1:l.layer, sub2:l.verifyNote||d.verifyNote||'', val2:'', isLayer:true});
+      opcRows.push({cat:'OPC', sub:l.step, val1:l.layer, sub2:l.verifyNote||d.verifyNote||'', val2:'', isLayer:true});
     });
   }
 
   // ── MTO 양식 ──
   const mtoRows = [
-    {cat:'DB',  sub:'Device',    val1:d.device,   sub2:'Process',   val2:d.process},
-    {cat:'MTO', sub:'목적',      val1:d.purpose,  sub2:'',          val2:''},
-    {cat:'MTO', sub:'귀속부서',  val1:d.dept||'', sub2:'RECN',      val2:d.recn||'LINK'},
-    {cat:'MTO', sub:'진행률',    val1:d.progress||'', sub2:'MTO Date', val2:d.mtoDate||''},
+    {cat:'DB',  sub:'Device',    val1:d.device,       sub2:'Process',   val2:d.process},
+    {cat:'MTO', sub:'목적',      val1:d.purpose,      sub2:'',          val2:'', wideVal:true},
+    {cat:'MTO', sub:'귀속부서',  val1:d.dept||'',     sub2:'RECN',      val2:d.recn||'LINK'},
+    {cat:'MTO', sub:'진행률',    val1:d.progress||'', sub2:'MTO Date',  val2:d.mtoDate||''},
   ];
   if(layers.length>0) {
-    mtoRows.push({cat:'Mask ID\n(PSM 포함)', sub:'Layer', val1:'', sub2:'SEEDS Verification', val2:'특이사항 Comment', isHeader:true});
+    mtoRows.push({cat:'MTO', sub:'Step', val1:'Layer', sub2:'SEEDS Verification', val2:'특이사항 Comment', isHeader:true});
     layers.forEach(l => {
-      mtoRows.push({cat:'', sub:l.step, val1:l.layer, sub2:l.seeds||'', val2:l.comment||'', isLayer:true});
+      mtoRows.push({cat:'MTO', sub:l.step, val1:l.layer, sub2:l.seeds||'', val2:l.comment||'', isLayer:true});
     });
   }
 
