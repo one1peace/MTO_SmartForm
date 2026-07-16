@@ -328,8 +328,8 @@ function parseSource(raw) {
 // 이메일 테이블 빌더
 // ════════════════════════════════════════
 const CLR = {
-  opc:{hd:'#1565C0',catA:'#E3EAF8',catB:'#E3EAF8',rowA:'#F8FAFF',rowB:'#F0F4FC'},
-  mto:{hd:'#2E7D32',catA:'#E8F5E9',catB:'#E8F5E9',rowA:'#F6FBF6',rowB:'#EDF7EE'},
+  opc:{hd:'#1565C0',catA:'#E3EAF8',catB:'#E3EAF8',rowA:'#F8FAFF',rowB:'#F0F4FC',sub:'#1976D2',subTx:'#ffffff'},
+  mto:{hd:'#2E7D32',catA:'#E8F5E9',catB:'#E8F5E9',rowA:'#F6FBF6',rowB:'#EDF7EE',sub:'#388E3C',subTx:'#ffffff'},
 };
 
 function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
@@ -420,19 +420,19 @@ function buildTable(form, rows) {
       if(row.wideVal){
         // wideVal 행: 소분류 | 값(colspan 3) — Verify 특이사항은 파란색
         const isVerify = row.sub === 'Verify 특이사항';
-        const subBg  = isVerify ? '#0277BD' : sub1bg;
-        const subClr = isVerify ? '#ffffff' : '#222';
+        const subBg  = isVerify ? '#0277BD' : c.sub;
+        const subClr = '#ffffff';
         const valBg  = isVerify ? '#E1F5FE' : '#fff';
         const valClr = isVerify ? '#01579B' : '#111';
-        h += `<td style="background:${subBg};color:${subClr};padding:4px 7px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:${isVerify?'700':'500'};">${esc(row.sub)}</td>`;
-        h += `<td colspan="3" style="background:${valBg};color:${valClr};padding:4px 7px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;text-align:center;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+        h += `<td style="background:${subBg};color:${subClr};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:10px;">${esc(row.sub)}</td>`;
+        h += `<td colspan="3" style="background:${valBg};color:${valClr};padding:5px 8px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v1||''}</td>`;
       } else {
-        // 일반 행: 소분류1 | 값1 | 소분류2 | 값2 (4열 풀 구조)
-        h += `<td style="background:${sub1bg};color:#222;padding:5px 8px;text-align:center;border-right:1px solid #c0c8e0;border-bottom:${bd};font-weight:500;">${esc(row.sub)}</td>`;
-        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-right:1px solid #c0c8e0;border-bottom:${bd};word-break:break-all;line-height:1.4;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
-        h += `<td style="background:${sub2bg};color:#222;padding:5px 8px;text-align:center;border-right:1px solid #c0c8e0;border-bottom:${bd};font-weight:500;">${esc(row.sub2||'')}</td>`;
+        // 일반 행: 소분류1(진한배경+흰글씨) | 값1(흰배경) | 소분류2(진한배경+흰글씨) | 값2(흰배경)
+        h += `<td style="background:${c.sub};color:${c.subTx};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:10px;">${esc(row.sub)}</td>`;
+        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v1||''}</td>`;
+        h += `<td style="background:${row.sub2 ? c.sub : '#fff'};color:${row.sub2 ? c.subTx : '#111'};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:${row.sub2?'700':'400'};font-size:10px;">${esc(row.sub2||'')}</td>`;
         const v2 = esc(row.val2);
-        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;">${v2||'<span style="color:#bbb;">—</span>'}</td>`;
+        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v2||''}</td>`;
       }
       h += '</tr>';
     });
