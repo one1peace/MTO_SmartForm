@@ -348,8 +348,8 @@ function buildTable(form, rows) {
   if(cur!==null)groups.push({cat:cur,items});
 
   // 컬럼 구조: 대분류 | 소분류1 | 값1 | 소분류2 | 값2  (총 5열)
-  let h = `<table style="border-collapse:collapse;width:100%;max-width:600px;font-family:Arial,'Malgun Gothic',sans-serif;font-size:10px;border:1px solid #BDC6D8;">`;
-  h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:6px 10px;text-align:center;font-size:12px;font-weight:900;letter-spacing:0.5px;text-align:center;">${title}</td></tr>`;
+  let h = `<table style="border-collapse:collapse;width:100%;max-width:720px;font-family:Arial,'Malgun Gothic',sans-serif;font-size:14px;border:1px solid #BDC6D8;">`;
+  h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:9px 14px;text-align:center;font-size:14px;font-weight:900;letter-spacing:0.5px;text-align:center;">${title}</td></tr>`;
 
   groups.forEach((g,gi)=>{
     const ev=gi%2===0;
@@ -370,24 +370,24 @@ function buildTable(form, rows) {
       // ── 대분류 셀 (첫 행만 rowspan, 레이어행은 빈 셀로 한 칸 밀기) ──
       if(ii===0){
         const catDisplay = (g.cat||'').replace(/\n/g,'<br>');
-        h += `<td rowspan="${rs}" style="background:${catBg};color:#1a2060;padding:5px 7px;font-weight:900;font-size:10px;vertical-align:middle;text-align:center;border-right:2px solid #BDC6D8;border-bottom:${bd};white-space:pre-line;min-width:44px;">${catDisplay}</td>`;
+        h += `<td rowspan="${rs}" style="background:${catBg};color:#1a2060;padding:7px 11px;font-weight:900;font-size:14px;vertical-align:middle;text-align:center;border-right:2px solid #BDC6D8;border-bottom:${bd};white-space:pre-line;min-width:56px;">${catDisplay}</td>`;
       }
 
       // ── 헤더 행 (Step/Layer 컬럼 타이틀) — 대분류 rowspan 셀 아래에 종속 ──
       if(isHdr){
         // 대분류 셀 없음(rowspan에 포함됨) — 소분류 자리에 Step 타이틀
-        h += `<td style="background:${c.hd};color:#fff;padding:5px 7px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">${esc(row.sub)}</td>`;
+        h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.sub)}</td>`;
         if(form==='opc'){
           // OPC 헤더: Step | Layer | PSM layer (각 1칸, 센터 정렬)
           const v1 = esc(row.val1);
-          h += `<td style="background:${c.hd};color:#fff;padding:5px 7px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">${v1||''}</td>`;
-          h += `<td colspan="2" style="background:#4527A0;color:#fff;padding:5px 7px;text-align:center;border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">PSM layer</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${v1||''}</td>`;
+          h += `<td colspan="2" style="background:#4527A0;color:#fff;padding:7px 11px;text-align:center;border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">PSM layer</td>`;
         } else {
           // MTO: Layer / SEEDS Verification / 특이사항 Comment (센터 정렬)
           const v1 = esc(row.val1);
-          h += `<td style="background:${c.hd};color:#fff;padding:5px 7px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">${v1||''}</td>`;
-          h += `<td style="background:#3949AB;color:#fff;padding:5px 7px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">${esc(row.sub2||'')}</td>`;
-          h += `<td style="background:${c.hd};color:#fff;padding:5px 7px;text-align:center;border-bottom:${bd};font-weight:900;text-align:center;font-size:10px;">${esc(row.val2||'')}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${v1||''}</td>`;
+          h += `<td style="background:#3949AB;color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.sub2||'')}</td>`;
+          h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.val2||'')}</td>`;
         }
         h += '</tr>';
         return;
@@ -396,20 +396,20 @@ function buildTable(form, rows) {
       // ── 레이어 데이터 행 — 대분류 rowspan 셀 아래 종속, 대분류 셀 없음 ──
       if(isLayer){
         // Step 값 (소분류 자리)
-        h += `<td style="background:${rowBg};color:#111;padding:4px 7px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:600;">${esc(row.sub)}</td>`;
+        h += `<td style="background:${rowBg};color:#111;padding:7px 11px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:600;">${esc(row.sub)}</td>`;
         if(form==='opc'){
           // OPC 데이터: Layer | PSM layer 빈칸(색칠, 1칸 병합)
           const v1 = esc(row.val1);
-          h += `<td style="background:#fff;color:#111;padding:4px 7px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td style="background:#fff;color:#111;padding:7px 11px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
           h += `<td colspan="2" style="background:#EDE7F6;border-bottom:${bd};border-left:1px solid #B39DDB;"></td>`;
         } else {
           // MTO: Layer / SEEDS(색칠) / 특이사항(색칠)
           const v1 = esc(row.val1);
           const seedsVal = esc(row.sub2||'');
           const commentVal = esc(row.val2||'');
-          h += `<td style="background:#fff;color:#111;padding:4px 7px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
-          h += `<td style="background:#7986CB;color:#ffffff;padding:4px 7px;text-align:center;border-right:1px solid #5C6BC0;border-bottom:${bd};font-weight:600;text-align:center;">${seedsVal||''}</td>`;
-          h += `<td style="background:#E8EAF6;color:#1A237E;padding:4px 7px;text-align:center;border-bottom:${bd};word-break:break-all;">${commentVal||''}</td>`;
+          h += `<td style="background:#fff;color:#111;padding:7px 11px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
+          h += `<td style="background:#7986CB;color:#ffffff;padding:7px 11px;text-align:center;border-right:1px solid #5C6BC0;border-bottom:${bd};font-weight:600;text-align:center;">${seedsVal||''}</td>`;
+          h += `<td style="background:#E8EAF6;color:#1A237E;padding:7px 11px;text-align:center;border-bottom:${bd};word-break:break-all;">${commentVal||''}</td>`;
         }
         h += '</tr>';
         return;
@@ -424,15 +424,15 @@ function buildTable(form, rows) {
         const subClr = '#ffffff';
         const valBg  = isVerify ? '#E1F5FE' : '#fff';
         const valClr = isVerify ? '#01579B' : '#111';
-        h += `<td style="background:${subBg};color:${subClr};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:10px;">${esc(row.sub)}</td>`;
-        h += `<td colspan="3" style="background:${valBg};color:${valClr};padding:5px 8px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v1||''}</td>`;
+        h += `<td style="background:${subBg};color:${subClr};padding:7px 12px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:14px;">${esc(row.sub)}</td>`;
+        h += `<td colspan="3" style="background:${valBg};color:${valClr};padding:7px 12px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:14px;">${v1||''}</td>`;
       } else {
         // 일반 행: 소분류1(진한배경+흰글씨) | 값1(흰배경) | 소분류2(진한배경+흰글씨) | 값2(흰배경)
-        h += `<td style="background:${c.sub};color:${c.subTx};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:10px;">${esc(row.sub)}</td>`;
-        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v1||''}</td>`;
-        h += `<td style="background:${row.sub2 ? c.sub : '#fff'};color:${row.sub2 ? c.subTx : '#111'};padding:5px 8px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:${row.sub2?'700':'400'};font-size:10px;">${esc(row.sub2||'')}</td>`;
+        h += `<td style="background:${c.sub};color:${c.subTx};padding:7px 12px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:14px;">${esc(row.sub)}</td>`;
+        h += `<td style="background:#fff;color:#111;padding:7px 12px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:14px;">${v1||''}</td>`;
+        h += `<td style="background:${row.sub2 ? c.sub : '#fff'};color:${row.sub2 ? c.subTx : '#111'};padding:7px 12px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:${row.sub2?'700':'400'};font-size:14px;">${esc(row.sub2||'')}</td>`;
         const v2 = esc(row.val2);
-        h += `<td style="background:#fff;color:#111;padding:5px 8px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:10px;">${v2||''}</td>`;
+        h += `<td style="background:#fff;color:#111;padding:7px 12px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:14px;">${v2||''}</td>`;
       }
       h += '</tr>';
     });
