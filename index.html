@@ -329,7 +329,7 @@ function parseSource(raw) {
 // ════════════════════════════════════════
 const CLR = {
   opc:{hd:'#1565C0',catA:'#E3EAF8',catB:'#E3EAF8',rowA:'#F8FAFF',rowB:'#F0F4FC',sub:'#1976D2',subTx:'#ffffff'},
-  mto:{hd:'#B94A00',catA:'#FAF0E8',catB:'#FAF0E8',rowA:'#FFFAF6',rowB:'#FFF5EE',sub:'#C85A00',subTx:'#ffffff'},
+  mto:{hd:'#3D7A60',catA:'#E8F5EF',catB:'#E8F5EF',rowA:'#F6FCF9',rowB:'#EEF9F4',sub:'#4A8A70',subTx:'#ffffff'},
 };
 
 function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
@@ -386,7 +386,7 @@ function buildTable(form, rows) {
           // MTO: Layer / SEEDS Verification / 특이사항 Comment (센터 정렬)
           const v1 = esc(row.val1);
           h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${v1||''}</td>`;
-          h += `<td style="background:#8B3A00;color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.sub2||'')}</td>`;
+          h += `<td style="background:#4A7A62;color:#fff;padding:7px 11px;text-align:center;border-right:1px solid rgba(255,255,255,0.25);border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.sub2||'')}</td>`;
           h += `<td style="background:${c.hd};color:#fff;padding:7px 11px;text-align:center;border-bottom:${bd};font-weight:900;text-align:center;font-size:14px;">${esc(row.val2||'')}</td>`;
         }
         h += '</tr>';
@@ -408,8 +408,8 @@ function buildTable(form, rows) {
           const seedsVal = esc(row.sub2||'');
           const commentVal = esc(row.val2||'');
           h += `<td style="background:#fff;color:#111;padding:7px 11px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};word-break:break-all;">${v1||'<span style="color:#bbb;">—</span>'}</td>`;
-          h += `<td style="background:#E8845A;color:#ffffff;padding:7px 11px;text-align:center;border-right:1px solid #C8603A;border-bottom:${bd};font-weight:600;text-align:center;">${seedsVal||''}</td>`;
-          h += `<td style="background:#FFF0E6;color:#7A2E00;padding:7px 11px;text-align:center;border-bottom:${bd};word-break:break-all;">${commentVal||''}</td>`;
+          h += `<td style="background:#3dd68c;color:#0a3d25;padding:7px 11px;text-align:center;border-right:1px solid #2ab87a;border-bottom:${bd};font-weight:600;text-align:center;">${seedsVal||''}</td>`;
+          h += `<td style="background:#E6F9F1;color:#0f4a30;padding:7px 11px;text-align:center;border-bottom:${bd};word-break:break-all;">${commentVal||''}</td>`;
         }
         h += '</tr>';
         return;
