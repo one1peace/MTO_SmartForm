@@ -14,7 +14,7 @@
   --opc:#a070ff;--mto:#3dd68c;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans KR',sans-serif;min-height:100vh;}
+body{background:var(--bg);color:var(--tx);font-family:Calibri,'IBM Plex Sans KR',sans-serif;min-height:100vh;}
 
 header{padding:18px 36px;border-bottom:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;gap:13px;}
 .logo{width:34px;height:34px;background:linear-gradient(135deg,var(--acc),var(--acc2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
@@ -32,20 +32,20 @@ header p{font-size:11.5px;color:var(--tx2);margin-top:1px;}
 .left-header p{font-size:11.5px;color:var(--tx2);line-height:1.6;}
 
 .paste-wrap{flex:1;display:flex;flex-direction:column;padding:16px 20px;gap:10px;}
-textarea.paste{flex:1;min-height:340px;background:var(--sf2);border:1.5px dashed var(--bd2);border-radius:10px;padding:14px;color:var(--tx);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.75;resize:none;outline:none;transition:border-color .18s;}
+textarea.paste{flex:1;min-height:340px;background:var(--sf2);border:1.5px dashed var(--bd2);border-radius:10px;padding:14px;color:var(--tx);font-family:Calibri,'IBM Plex Mono',monospace;font-size:11px;line-height:1.75;resize:none;outline:none;transition:border-color .18s;}
 textarea.paste:focus{border-color:var(--acc);border-style:solid;}
-textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans-serif;font-size:12px;line-height:1.9;}
+textarea.paste::placeholder{color:var(--tx3);font-family:Calibri,'IBM Plex Sans KR',sans-serif;font-size:12px;line-height:1.9;}
 
 .hint{font-size:11.5px;color:var(--tx2);line-height:1.6;}
 .hint b{color:var(--warn);}
 
-.status{padding:9px 13px;background:var(--sf3);border-radius:7px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--tx2);border:1px solid var(--bd);}
+.status{padding:9px 13px;background:var(--sf3);border-radius:7px;font-size:12px;font-family:Calibri,'IBM Plex Mono',monospace;color:var(--tx2);border:1px solid var(--bd);}
 .status .ok{color:var(--ok);}.status .err{color:var(--err);}
 
 .left-actions{padding:14px 20px 20px;display:flex;gap:8px;border-top:1px solid var(--bd);}
 
 /* ── 버튼 ── */
-.btn{padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn{padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:Calibri,'IBM Plex Sans KR',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
 .btn-acc{background:var(--acc);color:#fff;flex:1;justify-content:center;}.btn-acc:hover{background:#3a7de8;}
 .btn-ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd2);}.btn-ghost:hover{color:var(--tx);}
 
@@ -58,7 +58,7 @@ textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans
 .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .result-title{font-size:13px;font-weight:700;}
 .result-title.opc{color:var(--opc);}.result-title.mto{color:var(--mto);}
-.copy-btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;}
+.copy-btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:Calibri,'IBM Plex Sans KR',sans-serif;transition:all .15s;}
 .copy-opc{background:var(--opc);color:#fff;}.copy-opc:hover{background:#8f5ce8;}
 .copy-mto{background:var(--mto);color:#0c0c11;}.copy-mto:hover{background:#2ec47a;}
 
@@ -67,7 +67,7 @@ textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans
 .copy-all-bar{background:var(--sf2);border:1px solid var(--bd2);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
 .copy-all-bar p{font-size:12.5px;color:var(--tx2);flex:1;}
 .copy-all-bar strong{color:var(--tx);}
-.btn-all{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;padding:9px 22px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;font-family:'IBM Plex Sans KR',sans-serif;transition:all .15s;}
+.btn-all{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;padding:9px 22px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;font-family:Calibri,'IBM Plex Sans KR',sans-serif;transition:all .15s;}
 .btn-all:hover{opacity:.88;transform:translateY(-1px);}
 
 /* ── 파싱 미리보기 (왼쪽 하단) ── */
@@ -76,13 +76,55 @@ textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans
 .kv-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;}
 .kv-row{display:flex;gap:8px;font-size:11px;}
 .kv-key{color:var(--tx2);min-width:110px;flex-shrink:0;}
-.kv-val{color:var(--tx);font-family:'IBM Plex Mono',monospace;word-break:break-all;}
+.kv-val{color:var(--tx);font-family:Calibri,'IBM Plex Mono',monospace;word-break:break-all;}
 
 /* ── 토스트 ── */
 .toast{position:fixed;bottom:22px;right:22px;background:var(--sf2);border:1px solid var(--bd);border-radius:9px;padding:11px 17px;font-size:13px;display:flex;align-items:center;gap:7px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:9999;}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.ok{border-color:var(--ok);color:var(--ok);}
 .toast.warn{border-color:var(--warn);color:var(--warn);}
+
+/* ── OPC→MTO 변환 섹션 ── */
+.opc2mto-section{margin-top:28px;border-top:1px solid var(--bd);padding-top:24px;}
+.opc2mto-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.opc2mto-badge{background:linear-gradient(135deg,var(--opc),var(--acc2));color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.opc2mto-title{font-size:13px;font-weight:700;color:var(--tx);}
+.opc2mto-desc{font-size:11.5px;color:var(--tx2);margin-bottom:12px;line-height:1.6;}
+textarea.paste2{width:100%;min-height:160px;background:var(--sf2);border:1.5px dashed var(--bd2);border-radius:10px;padding:14px;color:var(--tx);font-family:Calibri,'IBM Plex Mono',monospace;font-size:11px;line-height:1.75;resize:vertical;outline:none;transition:border-color .18s;}
+textarea.paste2:focus{border-color:var(--opc);border-style:solid;}
+textarea.paste2::placeholder{color:var(--tx3);font-family:Calibri,'IBM Plex Sans KR',sans-serif;font-size:12px;line-height:1.9;}
+.opc2mto-actions{display:flex;gap:8px;margin-top:10px;}
+.btn-opc2mto{background:var(--opc);color:#fff;padding:9px 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:Calibri,'IBM Plex Sans KR',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-opc2mto:hover{background:#8f5ce8;}
+.opc2mto-status{padding:8px 13px;background:var(--sf3);border-radius:7px;font-size:12px;font-family:Calibri,'IBM Plex Mono',monospace;color:var(--tx2);border:1px solid var(--bd);margin-top:10px;}
+.opc2mto-result{margin-top:16px;}
+
+/* ── 섹션 구분선 ── */
+.section-divider{
+  display:flex;align-items:center;gap:16px;
+  padding:18px 36px;
+  border-top:2px solid var(--bd2);
+  background:var(--sf);
+}
+.section-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--bd2),transparent);}
+.section-divider-label{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--opc);padding:5px 14px;border:1px solid var(--opc);
+  border-radius:20px;white-space:nowrap;opacity:0.85;
+}
+
+/* ── 두번째 레이아웃 (Step 2→3) ── */
+.layout2{display:grid;grid-template-columns:420px 1fr;gap:0;border-top:1px solid var(--bd);}
+.left2-col{border-right:1px solid var(--bd);background:var(--sf);display:flex;flex-direction:column;padding:0;}
+.right2-col{background:var(--bg);padding:28px 32px;overflow-y:auto;}
+.left2-header{padding:20px 24px 14px;border-bottom:1px solid var(--bd);}
+.left2-header h2{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:3px;}
+.left2-header p{font-size:11.5px;color:var(--tx2);line-height:1.6;}
+.paste2-wrap{flex:1;display:flex;flex-direction:column;padding:16px 20px;gap:10px;}
+.right2-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:200px;color:var(--tx3);text-align:center;gap:10px;}
+.right2-empty .icon{font-size:28px;}
+.right2-empty p{font-size:13px;line-height:1.8;}
 </style>
 </head>
 <body>
@@ -150,6 +192,58 @@ textarea.paste::placeholder{color:var(--tx3);font-family:'IBM Plex Sans KR',sans
           <button class="copy-btn copy-mto" onclick="copyTable('mto')">📋 복사</button>
         </div>
         <div class="preview-box" id="tbl-mto"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── 섹션 구분선 ── -->
+<div class="section-divider">
+  <div class="section-divider-line"></div>
+  <div class="section-divider-label">⚡ Step 2 → 3 &nbsp;|&nbsp; OPC 양식 → MTO 양식 자동변환</div>
+  <div class="section-divider-line"></div>
+</div>
+
+<!-- ── Step 2→3: OPC→MTO 변환 레이아웃 ── -->
+<div class="layout2">
+
+  <!-- 왼쪽: OPC 입력 -->
+  <div class="left2-col">
+    <div class="left2-header">
+      <h2>📋 OPC 양식 붙여넣기</h2>
+      <p>생성된 OPC 양식 표를 복사(Ctrl+C) 후<br>아래 창에 붙여넣기(Ctrl+V) 하세요.</p>
+    </div>
+    <div class="paste2-wrap">
+      <textarea class="paste2" id="paste-opc2mto"
+        placeholder="OPC 양식 표를 붙여넣기 (Ctrl+V)&#10;&#10;자동 인식 항목:&#10;  Device / Process / New Lib.&#10;  목적 / 진행률 / Upload Date&#10;  Step + Layer 데이터행"
+        oninput="onOpc2mtoInput()"></textarea>
+      <div class="hint">💡 공통 항목(Device·Process·목적 등)은 <b>자동으로 가져옵니다</b></div>
+      <div class="opc2mto-status" id="opc2mto-status">대기 중 — OPC 양식을 붙여넣으면 MTO를 자동 생성합니다.</div>
+    </div>
+    <div class="left-actions">
+      <button class="btn-opc2mto" onclick="generateMtoFromOpc()">⚡ MTO 양식 생성</button>
+      <button class="btn btn-ghost" onclick="clearOpc2mto()">✕ 초기화</button>
+    </div>
+  </div>
+
+  <!-- 오른쪽: MTO 결과 -->
+  <div class="right2-col">
+    <div class="right2-empty" id="right2-empty">
+      <div class="icon">🎭</div>
+      <p>OPC 양식을 붙여넣고<br><strong style="color:var(--tx)">MTO 양식 생성</strong> 버튼을 누르면<br>MTO 이메일 표가 생성됩니다.</p>
+    </div>
+    <div id="right2-result" style="display:none;">
+      <div class="copy-all-bar">
+        <p><strong>MTO 양식 복사</strong> — 이메일에 붙여넣기</p>
+        <button class="btn-all" onclick="copyTable('mto2')">📋 MTO 복사</button>
+      </div>
+      <div class="result-section">
+        <div class="result-header">
+          <div class="result-title mto">MTO 양식 (OPC 기반 자동생성)</div>
+          <button class="copy-btn copy-mto" onclick="copyTable('mto2')">📋 복사</button>
+        </div>
+        <div class="preview-box" id="tbl-mto2"></div>
       </div>
     </div>
   </div>
@@ -348,7 +442,7 @@ function buildTable(form, rows) {
   if(cur!==null)groups.push({cat:cur,items});
 
   // 컬럼 구조: 대분류 | 소분류1 | 값1 | 소분류2 | 값2  (총 5열)
-  let h = `<table style="border-collapse:collapse;width:100%;max-width:720px;font-family:Arial,'Malgun Gothic',sans-serif;font-size:14px;border:1px solid #BDC6D8;">`;
+  let h = `<table style="border-collapse:collapse;width:100%;max-width:720px;font-family:Calibri,'Malgun Gothic',sans-serif;font-size:14px;border:1px solid #BDC6D8;">`;
   h += `<tr><td colspan="5" style="background:${c.hd};color:#fff;padding:10px 16px;text-align:center;font-size:15px;font-weight:900;letter-spacing:0.5px;">${title}</td></tr>`;
 
   groups.forEach((g,gi)=>{
@@ -538,6 +632,177 @@ function clearAll() {
   document.getElementById('tbl-opc').innerHTML='';
   document.getElementById('tbl-mto').innerHTML='';
   DATA={}; MTO_LAYERS=[];
+}
+
+
+// ════════════════════════════════════════
+// OPC → MTO 자동변환
+// ════════════════════════════════════════
+
+function onOpc2mtoInput() {
+  const raw = document.getElementById('paste-opc2mto').value.trim();
+  const statusEl = document.getElementById('opc2mto-status');
+  if(!raw) {
+    statusEl.innerHTML = '대기 중 — OPC 양식을 붙여넣으면 MTO를 자동 생성합니다.';
+    return;
+  }
+  // 행 수만 미리 카운트
+  const lines = raw.split('\n').filter(l => l.trim()).length;
+  statusEl.innerHTML = `<span class="ok">✓ ${lines}행 감지 — 생성 버튼을 눌러주세요</span>`;
+}
+
+function parseOpcTable(raw) {
+  // OPC 표 복사 구조 (세로 1열):
+  // 🔬 OPC / OPC / Device / [값] / Process / [값] / ...
+  // Step / Layer / PSM layer / [Step값] / [Layer값] / [Step값] / [Layer값] / ...
+  // Verify 특이사항 / [값]
+
+  const lines = raw.split('\n').map(l => l.trim());
+  const d = {};
+  const layers = [];
+
+  // ── 섹션 헤더 키워드 (값이 아닌 레이블) ──
+  const LABEL_SET = new Set([
+    'device','process','newlib','new lib','목적','설계teg변경','설계 teg변경',
+    'history','진행률','uploaddate','upload date','recn','verify특이사항',
+    'verify 특이사항','step','layer','psmlayer','psm layer',
+    'opc','mto','db','🔬 opc','🎭 mto'
+  ]);
+  const isLabel = s => {
+    const n = s.toLowerCase().replace(/[\s_\-\.]/g,'');
+    return LABEL_SET.has(n) || /^(🔬|🎭)/.test(s);
+  };
+
+  // ── Step/Layer 헤더 위치 탐색 ──
+  // 패턴: 'Step' 다음에 'Layer' 다음에 'PSM layer' (또는 바로 데이터)
+  let stepHdrIdx = -1, layerHdrIdx = -1, psmHdrIdx = -1, verifyIdx = -1;
+  for(let i = 0; i < lines.length; i++) {
+    const n = lines[i].toLowerCase().replace(/[\s_\-\.]/g,'');
+    if(n === 'step'  && stepHdrIdx  < 0) stepHdrIdx  = i;
+    if(n === 'layer' && layerHdrIdx < 0 && stepHdrIdx >= 0 && i > stepHdrIdx) layerHdrIdx = i;
+    if(n === 'psmlayer' && psmHdrIdx < 0) psmHdrIdx = i;
+    if((n.includes('verify') || n.includes('특이사항')) && verifyIdx < 0) verifyIdx = i;
+  }
+
+  // 데이터 시작: PSM layer 헤더 다음 or Layer 헤더 다음
+  const dataStart = psmHdrIdx >= 0 ? psmHdrIdx + 1
+                  : layerHdrIdx >= 0 ? layerHdrIdx + 1
+                  : -1;
+
+  // 데이터 끝: Verify 특이사항 or 끝까지
+  const dataEnd = verifyIdx >= 0 && verifyIdx > dataStart ? verifyIdx : lines.length;
+
+  // ── Step/Layer 데이터 추출 ──
+  // 구조: Step값, Layer값, Step값, Layer값 ... (2개씩 쌍)
+  if(dataStart >= 0) {
+    const dataVals = [];
+    for(let i = dataStart; i < dataEnd; i++) {
+      const v = lines[i];
+      if(!v) continue;
+      // 혹시 빈 PSM layer 값 행이 있을 경우 스킵하지 않음 (Step/Layer 순서 유지)
+      dataVals.push(v);
+    }
+    // 2개씩 쌍으로: [0]=Step, [1]=Layer
+    for(let i = 0; i < dataVals.length; i += 2) {
+      if(dataVals[i]) {
+        layers.push({
+          step:    dataVals[i]     || '',
+          layer:   dataVals[i + 1] || '',
+          seeds:   '',
+          comment: ''
+        });
+      }
+    }
+  }
+
+  // ── 일반 키-값 파싱 (Step 헤더 이전 구간 + Verify) ──
+  const parseEnd = stepHdrIdx >= 0 ? stepHdrIdx : dataStart >= 0 ? dataStart : lines.length;
+
+  for(let i = 0; i < lines.length; i++) {
+    const cur  = lines[i];
+    const next = lines[i + 1] || '';
+    if(!cur) continue;
+
+    // Verify 특이사항: 위치 무관하게 처리
+    if(i === verifyIdx) {
+      if(next && !isLabel(next)) d.verifyNote = next;
+      continue;
+    }
+
+    // Step 헤더 이후 건너뜀 (이미 위에서 처리)
+    if(i >= parseEnd) continue;
+
+    if(!isLabel(cur)) continue;
+    if(isLabel(next) || !next) continue; // 다음이 레이블이면 값 없음
+
+    const kn = cur.toLowerCase().replace(/[\s_\-\.]/g,'');
+    if(kn === 'device')                d.device     = next;
+    else if(kn === 'process')          d.process    = next;
+    else if(kn.includes('newlib'))     d.newLib     = next;
+    else if(kn === '목적')             d.purpose    = next;
+    else if(kn.includes('teg'))        d.teg        = next;
+    else if(kn === 'history')          d.history    = next;
+    else if(kn === '진행률')           d.progress   = next;
+    else if(kn.includes('date'))       d.uploadDate = next;
+    else if(kn === 'recn')             d.recn       = next;
+  }
+
+  // ── 1단계 DATA 병합 (OPC 표 값 우선, 없으면 DB기준표 값) ──
+  const merged = Object.assign({}, DATA, d);
+  if(!d.device   && DATA.device)   merged.device   = DATA.device;
+  if(!d.process  && DATA.process)  merged.process  = DATA.process;
+  if(!d.purpose  && DATA.purpose)  merged.purpose  = DATA.purpose;
+  if(!d.dept     && DATA.dept)     merged.dept     = DATA.dept;
+  if(!d.recn     && DATA.recn)     merged.recn     = DATA.recn;
+  if(!d.mtoDate  && DATA.mtoDate)  merged.mtoDate  = DATA.mtoDate;
+  if(!d.progress && DATA.progress) merged.progress = DATA.progress;
+  return { d: merged, layers };
+}
+
+function generateMtoFromOpc() {
+  const raw = document.getElementById('paste-opc2mto').value.trim();
+  const statusEl  = document.getElementById('opc2mto-status');
+  const resultEl  = document.getElementById('opc2mto-result');
+
+  if(!raw) { showToast('OPC 양식을 먼저 붙여넣어 주세요.', 'warn'); return; }
+
+  const { d, layers } = parseOpcTable(raw);
+
+  // 진행률 자동계산
+  const layerCount = layers.length;
+  const autoProgress = layerCount > 0 ? `${layerCount}/${layerCount} (100%)` : (d.progress||'');
+
+  // MTO rows 생성 (기존 generate()와 동일한 구조)
+  const mtoRows = [
+    {cat:'MTO', sub:'Device',   val1:d.device||'',   sub2:'Process',  val2:d.process||''},
+    {cat:'MTO', sub:'목적',     val1:d.purpose||'',  sub2:'',         val2:'', wideVal:true},
+    {cat:'MTO', sub:'귀속부서', val1:'DRAM 설계팀',  sub2:'RECN',     val2:d.recn||''},
+    {cat:'MTO', sub:'진행률',   val1:autoProgress,   sub2:'MTO Date', val2:''},
+  ];
+  if(layers.length > 0) {
+    mtoRows.push({cat:'MTO', sub:'Step', val1:'Layer', sub2:'SEEDS Verification', val2:'특이사항 Comment', isHeader:true});
+    layers.forEach(l => {
+      mtoRows.push({cat:'MTO', sub:l.step, val1:l.layer, sub2:l.seeds||'', val2:l.comment||'', isLayer:true});
+    });
+  }
+
+  const tableHTML = buildTable('mto', mtoRows);
+  document.getElementById('tbl-mto2').innerHTML = tableHTML;
+  document.getElementById('right2-empty').style.display = 'none';
+  document.getElementById('right2-result').style.display = 'block';
+
+  const cnt = Object.values(d).filter(v=>v).length;
+  statusEl.innerHTML = `<span class="ok">✓ ${cnt}개 항목 인식 · Layer ${layers.length}행 · MTO 양식 생성 완료</span>`;
+  showToast('MTO 양식 생성 완료!', 'ok');
+}
+
+function clearOpc2mto() {
+  document.getElementById('paste-opc2mto').value = '';
+  document.getElementById('opc2mto-status').innerHTML = '대기 중 — OPC 양식을 붙여넣으면 MTO를 자동 생성합니다.';
+  document.getElementById('opc2mto-result').style.display = 'none';
+  document.getElementById('tbl-mto2').innerHTML = '';
+  document.getElementById('right2-empty').style.display = 'flex';
+  document.getElementById('right2-result').style.display = 'none';
 }
 
 function showToast(msg,type){
