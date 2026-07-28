@@ -561,10 +561,11 @@ function generate() {
     {cat:'OPC', sub:'진행률',        val1:autoProgress,  sub2:'Upload Date', val2:d.uploadDate||''},
   ];
   if(layers.length>0) {
-    // 개정 전 Step 자동계산
-    const prevSteps = layers.map(l => calcPrevStep(l.step));
-    // 개정 전 Step 행 (Step 헤더 위에 표시)
-    opcRows.push({cat:'OPC', sub:'개정 전 Step', val1: prevSteps.join(' / '), sub2:'', val2:'', wideVal:true, isEditable:true});
+    // 개정 전 Step: Base Mask Set에서 숫자 앞부분 매칭
+    const baseMaskSet = d.baseMaskSet || '';
+    const prevSteps = layers.map(l => matchBaseMask(l.step, baseMaskSet));
+    const prevStepVal = prevSteps.filter(s=>s).join(' / ') || '—';
+    opcRows.push({cat:'OPC', sub:'개정 전 Step', val1: prevStepVal, sub2:'', val2:'', wideVal:true, isEditable:true});
     opcRows.push({cat:'OPC', sub:'Step', val1:'Layer', sub2:'', val2:'', isHeader:true});
     layers.forEach(l => {
       opcRows.push({cat:'OPC', sub:l.step, val1:l.layer, sub2:'', val2:'', isLayer:true});
@@ -811,32 +812,23 @@ function clearOpc2mto() {
 }
 
 
-// ── 이전 Step 자동계산 (알파벳 역순) ──
-// 예: 3.2AA → 3.2Z  /  3.2B → 3.2A  /  3.2A → 3.2(없음)
-// 예: 15.0AA → 15.0Z  /  15.0IK → 15.0IJ
-function calcPrevStep(step) {
-  if(!step) return '';
-  // 마지막 알파벳 suffix 추출
-  const m = step.match(/^(.*?)([A-Za-z]+)$/);
-  if(!m) return '';
-  const prefix = m[1];
-  const suffix = m[2];
-  if(suffix.length === 1) {
-    // 단일 알파벳: A면 이전 없음, 그 외 하나 앞
-    const code = suffix.charCodeAt(0);
-    if(suffix.toUpperCase() === 'A') return prefix + ''; // A면 base
-    return prefix + String.fromCharCode(code - 1).toUpperCase();
-  } else {
-    // 2자 이상: 마지막 글자 감소
-    const last = suffix[suffix.length - 1];
-    const rest = suffix.slice(0, -1);
-    const code = last.charCodeAt(0);
-    if(last.toUpperCase() === 'A') {
-      // AA → Z (앞 글자 제거, 단일 Z)
-      return prefix + rest.slice(0,-1) + 'Z';
-    }
-    return prefix + rest + String.fromCharCode(code - 1).toUpperCase();
-  }
+// ── 숫자 앞부분 추출 (예: "3.2AA" → "3.2", "15.0IK" → "15.0") ──
+function getNumPrefix(step) {
+  const m = step.match(/^([\d]+\.[\d]+|[\d]+)/);
+  return m ? m[1] : '';
+}
+
+// ── Base Mask Set에서 Upload Step 숫자와 매칭되는 이전 Step 찾기 ──
+// baseMaskSet 예: "3.0AH - 3.2FH - 3.3AH - 14.0HK - 15.0KK - 16.0IK"
+// uploadStep 예: "3.2AA" → 숫자 "3.2" 매칭 → "3.2FH" 반환
+function matchBaseMask(uploadStep, baseMaskSet) {
+  if(!uploadStep || !baseMaskSet) return '';
+  const numPfx = getNumPrefix(uploadStep);
+  if(!numPfx) return '';
+  // baseMaskSet을 구분자(-, /, ,, 공백)로 분리
+  const masks = baseMaskSet.split(/[\-\/,]+/).map(s => s.trim()).filter(s => s);
+  const matched = masks.find(m => getNumPrefix(m) === numPfx);
+  return matched || '';
 }
 
 function showToast(msg,type){
