@@ -513,11 +513,12 @@ function buildTable(form, rows) {
       const v1 = esc(row.val1);
       if(row.wideVal){
         // wideVal 행: 소분류 | 값(colspan 3) — Verify 특이사항은 파란색
-        const isVerify = row.sub === 'Verify 특이사항';
-        const subBg  = isVerify ? '#0277BD' : c.sub;
+        const isVerify   = row.sub === 'Verify 특이사항';
+        const isEditable = row.isEditable;
+        const subBg  = isVerify ? '#0277BD' : isEditable ? '#5C6BC0' : c.sub;
         const subClr = '#ffffff';
-        const valBg  = isVerify ? '#E1F5FE' : '#fff';
-        const valClr = isVerify ? '#01579B' : '#111';
+        const valBg  = isVerify ? '#E1F5FE' : isEditable ? '#EDE7F6' : '#fff';
+        const valClr = isVerify ? '#01579B' : isEditable ? '#311B92' : '#111';
         h += `<td style="background:${subBg};color:${subClr};padding:7px 12px;text-align:center;border-right:1px solid #BDC6D8;border-bottom:${bd};font-weight:700;font-size:14px;">${esc(row.sub)}</td>`;
         h += `<td colspan="3" style="background:${valBg};color:${valClr};padding:7px 12px;text-align:center;border-bottom:${bd};word-break:break-all;line-height:1.4;font-size:14px;">${v1||''}</td>`;
       } else {
@@ -560,6 +561,10 @@ function generate() {
     {cat:'OPC', sub:'진행률',        val1:autoProgress,  sub2:'Upload Date', val2:d.uploadDate||''},
   ];
   if(layers.length>0) {
+    // 개정 전 Step 자동계산
+    const prevSteps = layers.map(l => calcPrevStep(l.step));
+    // 개정 전 Step 행 (Step 헤더 위에 표시)
+    opcRows.push({cat:'OPC', sub:'개정 전 Step', val1: prevSteps.join(' / '), sub2:'', val2:'', wideVal:true, isEditable:true});
     opcRows.push({cat:'OPC', sub:'Step', val1:'Layer', sub2:'', val2:'', isHeader:true});
     layers.forEach(l => {
       opcRows.push({cat:'OPC', sub:l.step, val1:l.layer, sub2:'', val2:'', isLayer:true});
@@ -803,6 +808,35 @@ function clearOpc2mto() {
   document.getElementById('tbl-mto2').innerHTML = '';
   document.getElementById('right2-empty').style.display = 'flex';
   document.getElementById('right2-result').style.display = 'none';
+}
+
+
+// ── 이전 Step 자동계산 (알파벳 역순) ──
+// 예: 3.2AA → 3.2Z  /  3.2B → 3.2A  /  3.2A → 3.2(없음)
+// 예: 15.0AA → 15.0Z  /  15.0IK → 15.0IJ
+function calcPrevStep(step) {
+  if(!step) return '';
+  // 마지막 알파벳 suffix 추출
+  const m = step.match(/^(.*?)([A-Za-z]+)$/);
+  if(!m) return '';
+  const prefix = m[1];
+  const suffix = m[2];
+  if(suffix.length === 1) {
+    // 단일 알파벳: A면 이전 없음, 그 외 하나 앞
+    const code = suffix.charCodeAt(0);
+    if(suffix.toUpperCase() === 'A') return prefix + ''; // A면 base
+    return prefix + String.fromCharCode(code - 1).toUpperCase();
+  } else {
+    // 2자 이상: 마지막 글자 감소
+    const last = suffix[suffix.length - 1];
+    const rest = suffix.slice(0, -1);
+    const code = last.charCodeAt(0);
+    if(last.toUpperCase() === 'A') {
+      // AA → Z (앞 글자 제거, 단일 Z)
+      return prefix + rest.slice(0,-1) + 'Z';
+    }
+    return prefix + rest + String.fromCharCode(code - 1).toUpperCase();
+  }
 }
 
 function showToast(msg,type){
